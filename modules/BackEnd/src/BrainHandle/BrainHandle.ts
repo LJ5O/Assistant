@@ -1,5 +1,7 @@
 import { spawn, ChildProcessWithoutNullStreams } from "child_process";
 
+import {UserRequest, QueryModules} from './Types'
+
 export class BrainManager {
     
   private process: ChildProcessWithoutNullStreams | null = null;
@@ -36,6 +38,10 @@ export class BrainManager {
       return;
     }
     this.process.stdin.write(input + "\n");
+  }
+
+  ask(input: UserRequest|QueryModules): void {
+    this.send(JSON.stringify(input));
   }
 
   stop(): void {

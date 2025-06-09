@@ -3,6 +3,8 @@ print("Brain backend - Starting...")
 import sys
 from LLM.LLM import LLM
 
+from Json.utils import processInput
+
 class Brain():
     """
     Class used to manage the LLM in charge of the AI.
@@ -44,7 +46,8 @@ class Brain():
             if command.lower() == "exit": 
                 break
 
-            self.__LLM.graph.stream_graph_updates(command)
+            request = processInput(command)
+            self.__LLM.handleUserRequest(request)
             sys.stdout.flush()
 
 

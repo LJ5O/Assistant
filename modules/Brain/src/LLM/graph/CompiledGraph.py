@@ -16,3 +16,7 @@ class CompiledGraph():
         for event in self.getGraph().stream({"messages": [user_message]}, {}, stream_mode="values"):
             if "messages" in event:
                 event["messages"][-1].pretty_print()
+
+    def submitInput(self, input:str):
+        userMsg = HumanMessage(content=input)
+        return self.getGraph().stream({"messages": [userMsg]}, {}, stream_mode="values")
