@@ -1,0 +1,6 @@
+langgraph
+langchain
+langchain-community
+ollama
+langchain-ollama
+langchain-tavily
