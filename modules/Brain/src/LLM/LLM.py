@@ -16,8 +16,6 @@ class LLM():
 
             self.graph = CompiledGraph(GraphBuilder(self.LLM))
 
-            self.run()
-
 
         def run(self):
             while True:
