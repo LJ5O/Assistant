@@ -6,6 +6,7 @@ import {defineRoutes} from './Routes/routes';
 const PORT = 3000;
 
 const app:Express = express();
+app.use(express.json());
 
 defineRoutes(app);
 
