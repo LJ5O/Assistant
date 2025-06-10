@@ -1,6 +1,6 @@
 // User request to Brain
 export interface UserRequest {
-  type: "user_request";
+  type: "UserRequest";
   fields: {
     input: string;
     linked: string[];
@@ -13,21 +13,45 @@ export interface QueryModules {
   fields: Record<string, never>;
 }
 
-// Step in Brain though process
-export interface BrainStep {
-  action: "chatbot" | "tool";
-  input: string;
-  output: string;
+export interface HumanMessage {
+  type: 'HumanMessage';
+  content: string;
   id: string;
+}
+
+export interface ToolCall {
+  type: 'ToolCall'
+  name: string;
+  args: string[];
+  id: string;
+}
+
+export interface AIMessage {
+  type: 'AIMessage';
+  content: string;
+  id: string;
+  tool_calls: ToolCall[];
+  usage_metadata: {
+    input_tokens: number;
+    output_tokens: number;
+    total_tokens: number;
+  }
+}
+
+export interface ToolMessage {
+  type: 'ToolMessage';
+  name: string;
+  content: string;
+  id: string;
+  tool_call_id: string;
 }
 
 // Answer from Brain
 export interface UserAnswer {
-  type: "user_answer";
+  type: "UserAnswer";
   fields: {
     output: string;
-    called_tools: string[];
     linked: string[];
-    steps: BrainStep[];
+    steps: (HumanMessage|AIMessage|ToolMessage)[];
   };
 }

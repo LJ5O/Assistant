@@ -4,7 +4,8 @@ from .providers.Ollama import OllamaModel
 from .tools.Tools import Tools
 from .graph.GraphBuilder import GraphBuilder
 from .graph.CompiledGraph import CompiledGraph
-from Json.Types import UserRequest, UserAnswer
+from .runner.Runner import Runner
+from Json.Types import UserRequest, UserAnswer, HumanMessageJson, AIMessageJson, ToolMessageJson
 
 class LLM():
         """
@@ -21,18 +22,26 @@ class LLM():
             self.__modelName = model
             self.LLM = OllamaModel(self.__modelName, Tools.getAll())
 
-            self.graph = CompiledGraph(GraphBuilder(self.LLM))
+            self.__graph = CompiledGraph(GraphBuilder(self.LLM))
+            self.__runner = Runner(self.__graph)
 
-        def handleUserRequest(self, request:UserRequest) -> UserAnswer:
+        def getCompiledGraph(self) -> CompiledGraph:
             """
-            Runs the LLM using the provided request, and returns an answer
-
-            Args:
-                request (UserRequest): What the user asked.
+            Get the compiled graph for this app.
+            Useful for some advanced usages
 
             Returns:
-                UserAnswer: Our answer to this query.
+                CompiledGraph: CompiledGraph, our custom layer over the LangGraph Compiled Graph
             """
-            a = self.graph.submitInput(request.input)
-            for e in a:
-                print(e)
+            return self.__graph
+
+        def getRunner(self) -> Runner:
+            """
+            When you are working with the AI graph,
+            this Runner is the main entry point to interact with the app.
+
+            Returns:
+                Runner: A Runner object, with methods allowing easy interactions with the AI graph
+            """
+            return self.__runner
+        

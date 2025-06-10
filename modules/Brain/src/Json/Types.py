@@ -1,6 +1,26 @@
 import json
 
-class UserRequest():
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+
+
+class JsonConvertible():
+    """
+    Used only to propagate the toJSON() method to types defined here
+    """
+
+    def toJSON(self, indent:int=None) -> str:
+        """
+        Get a JSON string from this object
+
+        Args:
+            indent (int, optional): Prettier output, for debug. Defaults to None.
+
+        Returns:
+            str: JSON string object
+        """
+        return json.dumps(self.dict, ensure_ascii=False, indent=indent)
+
+class UserRequest(JsonConvertible):
     """
     Class used to represent a JSON object going to/from the node backend
     """
@@ -19,15 +39,6 @@ class UserRequest():
         self.linked = linked
 
         self.dict = {"type":self.type, "fields":{"input":self.input, "linked":self.linked}}
-
-    def toJSON(self) -> str:
-        """
-        Prepare the object to the JSON format
-
-        Returns:
-            str: JSON string
-        """
-        return json.dumps(self.dict, ensure_ascii=False)
 
     @staticmethod
     def fromJSON(json_str: str) -> 'UserRequest':
@@ -49,78 +60,176 @@ class UserRequest():
 
         return UserRequest(input=input_, Reqtype=type_, linked=linked)
 
-class BrainStep():
-    def __init__(self, action:str, input:str, output:str, id:str=None):
+class ToolCall(JsonConvertible):
+
+    def __init__(self, name:str, args:list[str], id:str):
         """
-        Create a new BrainStep object used to communicate with node backend
+        Prepare a tool call to be sent by JSON
 
         Args:
-            action (str): _description_
-            input (str): _description_
-            output (str): _description_
-            id (str, optional): _description_. Defaults to None.
+            name (str): Name of the called tool
+            args (list[str]): Arguments passed
+            id (str): ID of this tool
         """
-        self.action = action
-        self.input = input
-        self.output = output
+        self.name = name
+        self.args = args
         self.id = id
 
         self.dict = {
-            "action": self.action,
-            "input": self.input,
-            "output": self.output,
+            "type": "ToolCall",
+            "name": self.name,
+            "args": self.args,
             "id": self.id
         }
 
-    def toJSON(self) -> str:
+class AIMessageJson(JsonConvertible):
+
+    def __init__(self, content:str, id:str, tool_calls:list[ToolCall]=[], input_tokens:int=-1, output_tokens:int=-1, total_tokens:int=-1):
         """
-        Transforms this object into a JSON string
+        Prepares an AIMessage to be sent to the node backend
+
+        Args:
+            content (str): Content of this message
+            id (str): His ID
+            tool_calls (list[ToolCall], optional): Tools that were called at this step. Defaults to [].
+            input_tokens (int, optional): Input tokens for this message. Defaults to -1.
+            output_tokens (int, optional): Output tokens. Defaults to -1.
+            total_tokens (int, optional): Total number of tokens. Defaults to -1.
+        """
+        self.content = content
+        self.id = id
+        self.tools = tool_calls
+
+        self.dict = {
+            "type": "AIMessage",
+            "content": self.content,
+            "id": self.id,
+            "tool_calls": [tool.dict for tool in self.tools],
+            "usage_metadata": {
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "total_tokens": total_tokens
+            }
+        }
+
+    @staticmethod
+    def fromAIMessage(message: AIMessage) -> 'AIMessageJson':
+        """
+        Builds an AIMessageJson ready to be sent from an HumanMesage object
+
+        Args:
+            message (AIMessage): Object given by LangChain
 
         Returns:
-            str: JSON string
+            AIMessageJson: Object json friendly
         """
-        return json.dumps(self.dict, ensure_ascii=False)
+        tools = []
+        for tool in message.tool_calls:
+            args = []
+            for key in tool['args'].keys():
+                args.append(f"{key}:{tool['args'][key]}")
+            tools.append(ToolCall(tool['name'], args, tool['id']))
+            
+        return AIMessageJson(message.content, message.id, tools,
+            message.usage_metadata['input_tokens'],
+            message.usage_metadata['output_tokens'],
+            message.usage_metadata['total_tokens']
+        )
 
-class UserAnswer():
+class ToolMessageJson(JsonConvertible):
+
+    def __init__(self, name:str, content:str, id:str, tool_call_id:str=""):
+        """
+        Defines a new ToolMessage ready to be sent to the node backend
+
+        Args:
+            name (str): Name of the called tool
+            content (str): Answer we got from the tool
+            id (str): ID of this message
+            tool_call_id (str, optional): ID of the message where this tool was called. Defaults to "".
+        """
+        self.name = name
+        self.content = content
+        self.id = id
+        self.toolCallID = tool_call_id
+
+        self.dict = {
+            "type": "ToolMessage",
+            "name": self.name,
+            "content": self.content,
+            "id": self.id,
+            "tool_call_id": self.toolCallID
+        }
+    
+    @staticmethod
+    def fromToolMessage(message:ToolMessage) -> 'ToolMessageJson':
+        """
+        Builds a ToolMessageJson ready to be sent from an ToolMessage object
+
+        Args:
+            message (ToolMessage): Object given by LangChain
+
+        Returns:
+            ToolMessageJson: Object json friendly
+        """
+        return ToolMessageJson(message.name, message.content, message.id, message.tool_call_id)
+
+class HumanMessageJson(JsonConvertible):
+
+    def __init__(self, content:str, id:str):
+        """
+        Defines a new HumanMessage to be sent to the node backend
+
+        Args:
+            content (str): Text wrote by an human
+            id (str): ID of this message
+        """
+        self.content = content
+        self.id = id
+
+        self.dict = {
+            "type": "HumanMessage",
+            "content": self.content,
+            "id": self.id
+        }
+
+    @staticmethod
+    def fromHumanMessage(message:HumanMessage) -> 'HumanMessageJson':
+        """
+        Builds an HumanMessageJson ready to be sent from an HumanMesage object
+
+        Args:
+            message (HumanMessage): Object given by LangChain
+
+        Returns:
+            HumanMessageJson: Object json friendly
+        """
+        return HumanMessageJson(message.content, message.id)
+
+class UserAnswer(JsonConvertible):
     def __init__(
         self, 
         output:str, 
-        ansType:str="user_answer",
-        calledTools:list[str]=[],
         linked:list[str]=[],
-        steps:list[BrainStep]=[]
+        steps:list[ToolMessageJson|AIMessageJson|HumanMessageJson]=[]
     ):
         """
         Generate a new User Answer, to answer to a request made by an user
 
         Args:
             output (str): Reply from the model to the user
-            ansType (str, optional): Reply type. Defaults to "user_answer".
-            calledTools (list[str], optional): List of tools that were used. Defaults to [].
             linked (list[str], optional): Attached elements. Links to a document, picture... Defaults to [].
             steps (list[BrainStep], optional): Though steps, or history. Defaults to [].
         """
         self.output = output
-        self.type = ansType
-        self.calledTools = calledTools
         self.linked = linked
         self.steps = [step.dict for step in steps]
 
         self.dict = {
-            "type": self.type,
+            "type": "UserAnswer",
             "fields": {
                 "output": self.output,
-                "called_tools": self.calledTools,
                 "linked": self.linked,
                 "steps": self.steps
             }
         }
-    
-    def toJSON(self) -> str:
-        """
-        Converts this object into a JSON string
-
-        Returns:
-            str: JSON string
-        """
-        return json.dumps(self.dict, ensure_ascii=False)

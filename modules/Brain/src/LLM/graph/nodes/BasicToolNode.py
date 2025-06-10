@@ -17,7 +17,7 @@ class BasicToolNode:
             raise ValueError("No message found in input")
         outputs = []
         for tool_call in message.tool_calls:
-            print(tool_call["args"])
+            #print(tool_call["args"])
             tool_result = self.tools_by_name[tool_call["name"]].invoke(
                 tool_call["args"]
             )

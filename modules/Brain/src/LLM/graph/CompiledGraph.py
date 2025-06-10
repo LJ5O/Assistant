@@ -4,19 +4,52 @@ from langchain_core.messages import SystemMessage, HumanMessage
 
 class CompiledGraph():
     def __init__(self, graphBuiler:GraphBuilder):
+        """
+        Compile a GraphBuilder object. This object can also be used to run convenient methods on it.
+
+        Args:
+            graphBuiler (GraphBuilder): A Graph builder, ready to be built.
+        """
         self.__rawGraph = graphBuiler
         self.__compiledGraph = graphBuiler.compile()
 
     def getGraph(self):
+        """
+        Get the compiled graph directly
+
+        Returns:
+            CompiledGraph: A compiled graph from LangGraph
+        """
         return self.__compiledGraph
 
     def stream_graph_updates(self, user_input: str):
+        """
+        Debug method used to query the graph and print answers in console
+
+        Args:
+            user_input (str): A string input to the graph
+        """
         #system_message = SystemMessage(content="Tu es un assistant IA. N'appelle des function seulement, et seulement si tu en as besoin pour répondre.")
         user_message = HumanMessage(content=user_input)
         for event in self.getGraph().stream({"messages": [user_message]}, {}, stream_mode="values"):
             if "messages" in event:
                 event["messages"][-1].pretty_print()
 
-    def submitInput(self, input:str):
-        userMsg = HumanMessage(content=input)
-        return self.getGraph().stream({"messages": [userMsg]}, {}, stream_mode="values")
+    def submitInput(self, humanMessage:HumanMessage, systemMessage:SystemMessage=None):
+        """
+        A method that can be used to query the graph. Will Yield Graph outputs, ready to be worked on.
+
+        See:
+            https://langchain-ai.lang.chat/langgraph/how-tos/streaming/#streaming-api
+
+        Args:
+            humanMessage (HumanMessage): Message from an Human user.
+            systemMessage (SystemMessage, optional): System message, adding some optinal instructions or context. Defaults to None.
+
+        Yields:
+            Dict: Updates about the graph execution. Messages are under element['messages'].
+        """
+        messages:list[HumanMessage|SystemMessage] = [humanMessage]
+        if systemMessage: messages.append(systemMessage)
+
+        yield from self.getGraph().stream({"messages": messages}, {}, stream_mode="values")

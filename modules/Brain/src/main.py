@@ -46,8 +46,9 @@ class Brain():
             if command.lower() == "exit": 
                 break
 
-            request = processInput(command)
-            self.__LLM.handleUserRequest(request)
+            request = processInput(command) # JSON -> Object
+            answer = self.__LLM.getRunner().handleUserRequest(request) # Processing
+            print(answer.toJSON()) # Answer object -> JSON
             sys.stdout.flush()
 
 

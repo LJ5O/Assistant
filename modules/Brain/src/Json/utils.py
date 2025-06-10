@@ -24,7 +24,7 @@ def processInput(input:str) -> UserRequest:
         data = json.loads(input.strip())
 
         type_ = data["type"]
-        if(type_=="user_request"):
+        if(type_=="UserRequest"):
             return UserRequest.fromJSON(input)
         else:
             raise unknownJsonObject()

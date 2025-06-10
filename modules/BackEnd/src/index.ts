@@ -9,7 +9,7 @@ manager.start();
 setTimeout(() => {
 
   const r:UserRequest = {
-    type: "user_request",
+    type: "UserRequest",
     fields: {
       input: "Hello, what's 2*4 .",
       linked:[]
