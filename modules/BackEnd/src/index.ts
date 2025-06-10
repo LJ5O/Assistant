@@ -1,26 +1,16 @@
-import { BrainManager } from "./BrainHandle/BrainHandle";
-import { UserRequest } from "./BrainHandle/Types";
+import express, { Express } from 'express';
+import swaggerUi from 'swagger-ui-express';
 
-const manager = new BrainManager("../Brain/src/main.py");
+import {defineRoutes} from './Routes/routes';
 
-manager.start();
+const PORT = 3000;
 
-// Exemple d'envoi de commande après un délai
-setTimeout(() => {
+const app:Express = express();
 
-  const r:UserRequest = {
-    type: "UserRequest",
-    fields: {
-      input: "Hello, what's 2*4 .",
-      linked:[]
-    }
-  }
+defineRoutes(app);
 
-  manager.ask(r);
-  manager.getAnswerFromBrain(8000).then(v=>console.log(v))
-}, 5000);
 
-// Arrêt après 10 secondes
-setTimeout(() => {
-  manager.stop();
-}, 15000);
+app.listen(PORT, () => {
+  console.log(`Serveur lancé sur http://localhost:${PORT}`);
+  console.log(`Docs Swagger sur http://localhost:${PORT}/docs`);
+});
