@@ -1,3 +1,5 @@
+import sys
+
 from langchain_ollama import ChatOllama
 from langchain.tools import Tool, StructuredTool
 
@@ -33,7 +35,7 @@ class OllamaModel():
         ).bind_tools(self.__tools)
         
         except Exception as err:
-            print(f"ERROR : Please, ensure Ollama is up and running on your computer :\n {err}")
+            sys.stderr.write(f"ERROR : Please, ensure Ollama is up and running on your computer :\n {err}")
             raise
 
     def getModel(self) -> ChatOllama:

@@ -1,5 +1,3 @@
-print("Brain backend - Starting...")
-
 import sys
 from LLM.LLM import LLM
 
@@ -25,7 +23,7 @@ class Brain():
             self.__LLM = LLM(self.__modelVersion)
             
         except:
-            print("$error$ : can't start or load the model ! Are you sure you gave a valid version ?") # TODO for better error management
+            sys.stderr.write("$error$ : can't start or load the model ! Are you sure you gave a valid version ?") # TODO for better error management
             return # Don't start the loop, stops here
         
         # Start the work loop !

@@ -17,6 +17,7 @@ setTimeout(() => {
   }
 
   manager.ask(r);
+  manager.getAnswerFromBrain(8000).then(v=>console.log(v))
 }, 5000);
 
 // Arrêt après 10 secondes
