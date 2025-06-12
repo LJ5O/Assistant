@@ -10,7 +10,7 @@ const props = withDefaults(defineProps<Props>(), {
     type: 'primary'
 })
 
-const buttonClass:string = computed(()=>{
+const buttonClass = computed(()=>{
     switch(props.type){
         case 'secondary':
             return 'bg-gray-500 hover:bg-gray-600 text-white'
