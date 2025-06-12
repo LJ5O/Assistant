@@ -3,7 +3,7 @@
 </script>
 
 <template>
-    <div class="w-full min-h-16 h-fit bg-neutral-800 flex flex-row flex-wrap justify-between header-div">
+    <div class="w-full bg-neutral-900 flex flex-row flex-wrap justify-between header-div">
         <div class="h-12 w-12 ml-2 my-auto">
             <img src="https://picsum.photos/75" class="rounded-xs w-full h-full"/>
         </div>

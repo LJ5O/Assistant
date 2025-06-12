@@ -1,11 +1,11 @@
 <script setup lang="ts">
-    import Header from "../components/Gui/Header/Header.vue"
+    import PageTemplate from '../components/PageTemplate/PageTemplate.vue'
 </script>
 
 <template>
-    <div class="w-full h-full">
-        <Header />
-    </div>
+    <PageTemplate>
+        <p>Hi !</p>
+    </PageTemplate>
 </template>
 
 <style scoped>

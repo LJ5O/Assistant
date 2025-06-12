@@ -17,9 +17,5 @@
 </template>
 
 <style scoped>
-    @reference "tailwindcss";
 
-    .header-div * {
-        @apply my-auto;
-    }
 </style>
