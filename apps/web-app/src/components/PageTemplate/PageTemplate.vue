@@ -13,7 +13,7 @@
             <LeftMenu class="h-full w-1/10 min-w-[50px]" />
             
             <div class="w-9/10 h-full overflow-x-scroll overflow-y-hidden">
-                <div class="w-98/100 h-fit max-h-95/100 m-auto mt-4 text-neutral-100">
+                <div class="w-98/100 h-full m-auto mt-4 text-neutral-100">
                     <slot /><!-- Main content -->
                 </div>
             </div>
