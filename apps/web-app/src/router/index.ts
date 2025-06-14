@@ -13,6 +13,7 @@ const router = createRouter({
       path: '/control',
       name: 'control',
       component: Control,
+      meta: { requiresAuth: true }
     }/*,
     {
       path: '/about',
@@ -24,5 +25,15 @@ const router = createRouter({
     },*/
   ],
 })
+
+router.beforeEach((to, from, next) => {
+  const token = sessionStorage.getItem('jwt');
+
+  if(to.meta.requiresAuth && !token){
+    next('/'); // Token is not available => login
+  }else{
+    next(); // Token is available, OK
+  }
+});
 
 export default router

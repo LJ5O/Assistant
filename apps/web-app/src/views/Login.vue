@@ -1,14 +1,31 @@
 <script setup lang="ts">
     import {ref} from 'vue'
+    import axios from 'axios';
+    import { useRouter } from 'vue-router';
 
     import Input from "../components/Form/Input.vue"
     import Button from "../components/Form/Button.vue"
 
+    const router = useRouter()
+
     const login = ref<string>('')
     const password = ref<string>('')
 
-    function test(){
-        window.alert(login.value+'@'+password.value);
+    function getToken(){
+        axios.post('http://127.0.0.1:3000/login', {
+          username: login.value,
+          password: password.value
+        }).then((answer)=>{
+          sessionStorage.setItem('jwt', answer.data.token)
+          console.log("Login OK ! ")
+          console.warn("TODO : remove me. Token is "+answer.data.token)
+          router.push('/control');
+
+        }).catch((err)=>{
+          console.error(err)
+          alert("Auth failed !")
+
+        })
     }
 </script>
 
@@ -32,7 +49,7 @@
                 <Input v-model="password" class="w-3/4 mr-auto ml-auto" type="password"/>
             </label>
 
-            <Button content="Login" class="content-end my-3 self-end mr-5" @click="test()" />
+            <Button content="Login" class="content-end my-3 self-end mr-5" @click="getToken" />
         </div>
     </div>
 </template>
