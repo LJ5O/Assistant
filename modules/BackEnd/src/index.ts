@@ -1,5 +1,4 @@
 import express, { Express } from 'express';
-import swaggerUi from 'swagger-ui-express';
 
 import {defineRoutes} from './Routes/routes';
 

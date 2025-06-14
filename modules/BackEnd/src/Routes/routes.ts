@@ -1,13 +1,33 @@
-import { Express } from 'express';
+import { Express, Request, Response, NextFunction } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import jwt from 'jsonwebtoken';
 
 import {SWAGGER_CONFIG} from './swaggerConfig'
 const SECRET_KEY = 'change-moi'; // TODO : Move to env var or .env file
 
+function authenticateToken(req: Request, res: Response, next: NextFunction) {
+    const token:string|undefined = req.headers['authorization'] || undefined;
+
+    if(!token){
+        return res.status(401).json({ error: 'You must provide a token !' });
+    }
+
+    jwt.verify(token, SECRET_KEY, (err, user)=>{
+        if(err){
+            return res.status(403).json({ error: 'This Token is not valid !' });
+        }
+
+        console.log(user); // TODO : remove this test print
+
+        next();
+    });
+}
+
 export function defineRoutes(app:Express){
     app.get('/hello', (req, res) => {
-        res.json({ message: 'Hello World' });
+        authenticateToken(req, res, ()=>{
+            res.json({ message: 'Hello World' });
+        });  
     });
 
     app.post('/login', (req, res) => {

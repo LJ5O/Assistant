@@ -1,4 +1,3 @@
-// Really, just use an AI to generate this, don't loose your time here
 import { SwaggerOptions } from 'swagger-ui-express';
 
 export const SWAGGER_CONFIG: SwaggerOptions = {
@@ -9,10 +8,24 @@ export const SWAGGER_CONFIG: SwaggerOptions = {
     description: 'Une API de démonstration avec Express, TypeScript et Swagger',
   },
   basePath: '/',
+  securityDefinitions: {
+    Bearer: {
+      type: 'apiKey',
+      name: 'authorization',
+      in: 'header',
+      description: 'JWT Token, inserted directly',
+    },
+  },
+  security: [
+    {
+      Bearer: [],
+    },
+  ],
   paths: {
     '/hello': {
       get: {
         summary: 'Hello World',
+        security: [{ Bearer: [] }],
         responses: {
           200: {
             description: 'Message de bienvenue',
