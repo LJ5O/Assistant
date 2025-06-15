@@ -21,7 +21,7 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install dependencies
-        run: npm install --include=dev
+        run: cd apps/wab-app/ && npm install --include=dev
 
       - name: 🛠️ Types checks
         run: npm run type-check
