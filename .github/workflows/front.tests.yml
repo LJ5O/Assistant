@@ -31,6 +31,6 @@ jobs:
         run: npm run type-check
 
       - name: 🧪 Run tests
-        run: npm test:e2e
+        run: npm run test:e2e
         env:
           NODE_ENV: test
