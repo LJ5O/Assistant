@@ -41,15 +41,15 @@
 
             <label class="login-input">
                 <h2>Login</h2>
-                <Input v-model="login" class="w-3/4 mr-auto ml-auto"/>
+                <Input v-model="login" class="w-3/4 mr-auto ml-auto" id="input-login"/>
             </label>
 
             <label class="login-input">
                 <h2>Password</h2>
-                <Input v-model="password" class="w-3/4 mr-auto ml-auto" type="password"/>
+                <Input v-model="password" class="w-3/4 mr-auto ml-auto" type="password" id="input-password"/>
             </label>
 
-            <Button content="Login" class="content-end my-3 self-end mr-5" @click="getToken" />
+            <Button content="Login" class="content-end my-3 self-end mr-5" @click="getToken" id="input-submit" />
         </div>
     </div>
 </template>
