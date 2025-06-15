@@ -9,6 +9,9 @@ on:
 jobs:
   front-end-ci:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web-app
 
     steps:
       - name: ⬇️ Checkout repository
@@ -21,7 +24,7 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install dependencies
-        run: cd apps/wab-app/ && npm install --include=dev
+        run: npm install --include=dev
 
       - name: 🛠️ Types checks
         run: npm run type-check
