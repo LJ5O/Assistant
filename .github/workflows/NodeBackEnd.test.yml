@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./modules/backEnd
+        working-directory: ./modules/BackEnd/
 
     steps:
       - name: ⬇️ Checkout repository
