@@ -1,6 +1,7 @@
 from langchain_ollama import ChatOllama
 
 from .providers.Ollama import OllamaModel
+from .providers.Test import TestModel
 from .tools.Tools import Tools
 from .graph.GraphBuilder import GraphBuilder
 from .graph.CompiledGraph import CompiledGraph
@@ -20,7 +21,11 @@ class LLM():
                 model (str, optional): Main LLM model. Defaults to "llama3.1:8b".
             """
             self.__modelName = model
-            self.LLM = OllamaModel(self.__modelName, Tools.getAll())
+            
+            if self.__modelName == "test":
+                self.LLM = TestModel()
+            else:
+                self.LLM = OllamaModel(self.__modelName, Tools.getAll())
 
             self.__graph = CompiledGraph(GraphBuilder(self.LLM))
             self.__runner = Runner(self.__graph)

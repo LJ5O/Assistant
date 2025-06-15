@@ -5,3 +5,4 @@ ollama
 langchain-ollama
 langchain-tavily
 pydantic
+pytest

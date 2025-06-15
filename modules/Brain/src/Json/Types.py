@@ -25,7 +25,7 @@ class UserRequest(JsonConvertible):
     Class used to represent a JSON object going to/from the node backend
     """
 
-    def __init__(self, input:str, Reqtype:str="user_request", linked:list[str]=[]):
+    def __init__(self, input:str, linked:list[str]=[]):
         """
         Prepare a new instance of UserRequest
 
@@ -35,7 +35,7 @@ class UserRequest(JsonConvertible):
             linked (list[str], optional): Anything attached ( pictures, documents ) ? Defaults to [].
         """
         self.input = input
-        self.type = Reqtype
+        self.type = "userRequest"
         self.linked = linked
 
         self.dict = {"type":self.type, "fields":{"input":self.input, "linked":self.linked}}
@@ -53,7 +53,7 @@ class UserRequest(JsonConvertible):
         """
         data = json.loads(json_str)
         
-        type_ = data.get("type", "user_request")
+        type_ = data.get("type", "userRequest")
         fields = data.get("fields", {})
         input_ = fields.get("input", "")
         linked = fields.get("linked", [])
@@ -131,9 +131,9 @@ class AIMessageJson(JsonConvertible):
             tools.append(ToolCall(tool['name'], args, tool['id']))
             
         return AIMessageJson(message.content, message.id, tools,
-            message.usage_metadata['input_tokens'],
-            message.usage_metadata['output_tokens'],
-            message.usage_metadata['total_tokens']
+            message.usage_metadata['input_tokens'] if message.usage_metadata else None,
+            message.usage_metadata['output_tokens'] if message.usage_metadata else None,
+            message.usage_metadata['total_tokens'] if message.usage_metadata else None
         )
 
 class ToolMessageJson(JsonConvertible):
