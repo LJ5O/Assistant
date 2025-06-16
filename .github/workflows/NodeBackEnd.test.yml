@@ -22,13 +22,10 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-          cache-dependency-path: apps/web-app/package-lock.json
+          cache-dependency-path: modules/BackEnd/package-lock.json
 
-      - name: 📦 Install dependencies
+      - name: 📦 Install dependencies Npm
         run: npm install --include=dev
-
-      - name: ⬇️ Checkout repository
-        uses: actions/checkout@v4
 
       - name: 🐍 Setup Python 3.12
         uses: actions/setup-python@v5
@@ -36,7 +33,7 @@ jobs:
           python-version: 3.12
           cache: 'pip'
 
-      - name: 📦 Install dependencies
+      - name: 📦 Install dependencies Python
         working-directory: ./modules/Brain/
         run: |
           python -m pip install --upgrade pip
