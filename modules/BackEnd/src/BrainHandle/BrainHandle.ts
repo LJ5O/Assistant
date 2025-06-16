@@ -35,7 +35,7 @@ export class BrainManager {
     });
 
     // Check for Brain start
-    this.getAnswerFromBrain(1000).then(message=>{
+    this.getAnswerFromBrain(3000).then(message=>{
       if(message.trim() == "ready") console.log("Python process started.");
       else{
         console.error("ERROR : Brain seems to be not working...")
