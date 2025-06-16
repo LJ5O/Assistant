@@ -10,6 +10,8 @@
 
     const login = ref<string>('')
     const password = ref<string>('')
+    const failed = ref<boolean>(false)
+    const errCode = ref<string>('')
 
     function getToken(){
         axios.post('http://127.0.0.1:3000/login', {
@@ -23,8 +25,8 @@
 
         }).catch((err)=>{
           console.error(err)
-          alert("Auth failed !")
-
+          failed.value = true;
+          errCode.value = err.code; // ERR_BAD_REQUEST for 401 (login/password), ERR_NETWORK if backend unreachable
         })
     }
 </script>
@@ -36,6 +38,11 @@
             w-1/4 h-fit min-w-80 bg-blue-600 border-2 border-gray-500 rounded-lg shadow-2xl/80 shadow-black
             flex flex-col content-center text-center
         ">
+
+            <div v-if="failed" class="bg-red-700 w-fit mx-auto mt-2 p-2 rounded-2xl text-white text-lg" id="login-error-div">
+                <p v-if="errCode === 'ERR_BAD_REQUEST'" id="login-401-error">Your login/password seems to be wrong !<br>Sorry, try again.</p>
+                <p v-else id="login-other-error">An error occured, please try again later !</p>
+            </div>
 
             <p class="text-white mt-3 text-2xl font-bold">Please, login to continue</p>
 

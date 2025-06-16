@@ -17,9 +17,43 @@ describe('Login form', () => {
         password: 'admin'
       });
     });
-
-    const path = cy.location('hostname') // Should be /control
+    // We should move to another page
     cy.location('pathname').should('eq', '/control') // API docs : https://docs.cypress.io/api/commands/location
+    cy.get("#login-error-div").should('not.exist')
 
+  })
+
+  it('Fails with invalid credentials', () => {
+
+    cy.intercept('POST', '/login', { // Interception of request to /login
+      statusCode: 401
+    }).as('mockLogin');
+
+    cy.visit('/')
+    cy.get('#input-login').type('abc')
+    cy.get('#input-password').type('123')
+    cy.get('#input-submit').click()
+
+    cy.location('pathname').should('eq', '/')
+    cy.get("#login-error-div").should('exist')
+    cy.get("#login-401-error").should('exist')
+    cy.get("#login-other-error").should('not.exist')
+  })
+
+  it('Fails with network error', () => {
+
+    cy.intercept('POST', '/login', { // Interception of request to /login
+      forceNetworkError: true
+    }).as('mockLogin');
+
+    cy.visit('/')
+    cy.get('#input-login').type('abc')
+    cy.get('#input-password').type('123')
+    cy.get('#input-submit').click()
+
+    cy.location('pathname').should('eq', '/')
+    cy.get("#login-error-div").should('exist')
+    cy.get("#login-401-error").should('not.exist')
+    cy.get("#login-other-error").should('exist')
   })
 })
