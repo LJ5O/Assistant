@@ -11,13 +11,15 @@ export class BrainManager {
 
   constructor(private scriptPath: string) {}
 
-  start(): void {
+  start(model:string|undefined=undefined): void {
     if (this.process) {
       console.log("Process already running");
       return;
     }
 
-    this.process = spawn("python3", [this.scriptPath]);
+    if(model) this.process = spawn("python3", [this.scriptPath, '-m', model]);
+    else this.process = spawn("python3", [this.scriptPath]);
+    
 
     this.process.stdout.on("data", (data) => {
       this.messagesFile.push(data);
@@ -33,7 +35,7 @@ export class BrainManager {
     });
 
     // Check for Brain start
-    this.getAnswerFromBrain().then(message=>{
+    this.getAnswerFromBrain(1000).then(message=>{
       if(message.trim() == "ready") console.log("Python process started.");
       else{
         console.error("ERROR : Brain seems to be not working...")
@@ -95,5 +97,9 @@ export class BrainManager {
       }, timeoutMs);
       check();
     })
+  }
+
+  getSubprocess():ChildProcessWithoutNullStreams | null{
+    return this.process
   }
 }

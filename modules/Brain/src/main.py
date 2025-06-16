@@ -56,7 +56,7 @@ def printHelp():
     print("Brain - Help - If you don't know what you're doing, you are in the wrong place !")
     print("This subprocess takes your human input, and will think about something to answer\n")
     print("Valid args :\n")
-    print("-m <Model> : Models from Ollama")
+    print("-m <Model> : Models from Ollama, or 'test' for testing purposes")
     print("-p \"[The text you want to append at the begining of every request made to the AI.]\" : That's a good place to remember it to answer as you like. ")
 
 if __name__ == "__main__":
