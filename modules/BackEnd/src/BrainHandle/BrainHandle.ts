@@ -6,7 +6,7 @@ import { rejects } from "assert";
 export class BrainManager {
     
   private process: ChildProcessWithoutNullStreams | null = null;
-
+  private ready: boolean = false;
   private messagesFile: string[] = [];
 
   constructor(private scriptPath: string) {}
@@ -36,7 +36,10 @@ export class BrainManager {
 
     // Check for Brain start
     this.getAnswerFromBrain(3000).then(message=>{
-      if(message.trim() == "ready") console.log("Python process started.");
+      if(message.trim() == "ready"){
+        console.log("Python process started.");
+        this.ready = true;
+      }
       else{
         console.error("ERROR : Brain seems to be not working...")
         this.stop();
@@ -62,6 +65,7 @@ export class BrainManager {
     if (this.process) {
       this.send("exit")
       this.process = null;
+      this.ready = false;
     }
   }
 
@@ -101,5 +105,9 @@ export class BrainManager {
 
   getSubprocess():ChildProcessWithoutNullStreams | null{
     return this.process
+  }
+
+  isReady():boolean{
+    return this.ready
   }
 }
