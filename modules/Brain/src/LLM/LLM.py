@@ -6,7 +6,6 @@ from .tools.Tools import Tools
 from .graph.GraphBuilder import GraphBuilder
 from .graph.CompiledGraph import CompiledGraph
 from .runner.Runner import Runner
-from Json.Types import UserRequest, UserAnswer, HumanMessageJson, AIMessageJson, ToolMessageJson
 
 class LLM():
         """
@@ -50,3 +49,6 @@ class LLM():
             """
             return self.__runner
         
+if __name__ == "__main__":
+    from Json.Types import UserRequest, UserAnswer, HumanMessageJson, AIMessageJson, ToolMessageJson
+    llm = LLM()

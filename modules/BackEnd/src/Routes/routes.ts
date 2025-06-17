@@ -6,22 +6,24 @@ import {SWAGGER_CONFIG} from './swaggerConfig'
 
 import { ask } from '../Logic/Chat/ask'
 import { BrainManager } from '../BrainHandle/BrainHandle';
+import { UserData, AuthenticatedRequest } from '../Types/API';
+
 const SECRET_KEY = 'change-moi'; // TODO : Move to env var or .env file
 
-function authenticateToken(req: Request, res: Response, next: NextFunction) {
+function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     const token:string|undefined = req.headers['authorization'] || undefined;
 
     if(!token){
         return res.status(401).json({ error: 'You must provide a token !' });
     }
 
-    jwt.verify(token, SECRET_KEY, (err, user)=>{
+    jwt.verify(token, SECRET_KEY, (err, user)=>{//user should be UserData typeS
         if(err){
             return res.status(403).json({ error: 'This Token is not valid !' });
         }
 
         console.log(user); // TODO : remove this test print
-
+        req.user = user as UserData
         next();
     });
 }
@@ -33,19 +35,19 @@ export function defineRoutes(app:Express){
         });  
     });
 
-    app.post('/login', (req, res) => {
+    app.post('/login', (req:Request, res:Response) => {
         const { username, password } = req.body;
 
         // Simule une authentification
         if (username === 'admin' && password === 'admin') {
-            const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
+            const token = jwt.sign({ login:username } as UserData, SECRET_KEY, { expiresIn: '1h' });
             res.json({ token });
         } else {
             res.status(401).json({ error: 'Invalid credentials' });
         }
     });
 
-    app.post('/ask', (req, res) => {
+    app.post('/ask', (req:AuthenticatedRequest, res:Response) => {
         authenticateToken(req, res, ()=>{
             const handle = new BrainManager("./../Brain/src/main.py")
             handle.start()

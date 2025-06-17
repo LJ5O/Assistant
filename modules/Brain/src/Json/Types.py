@@ -25,7 +25,7 @@ class UserRequest(JsonConvertible):
     Class used to represent a JSON object going to/from the node backend
     """
 
-    def __init__(self, input:str, linked:list[str]=[]):
+    def __init__(self, input:str, thread_id:str, linked:list[str]=[]):
         """
         Prepare a new instance of UserRequest
 
@@ -35,10 +35,11 @@ class UserRequest(JsonConvertible):
             linked (list[str], optional): Anything attached ( pictures, documents ) ? Defaults to [].
         """
         self.input = input
+        self.threadId = thread_id
         self.type = "userRequest"
         self.linked = linked
 
-        self.dict = {"type":self.type, "fields":{"input":self.input, "linked":self.linked}}
+        self.dict = {"type":self.type, "thread_id":self.threadId, "fields":{"input":self.input, "linked":self.linked}}
 
     @staticmethod
     def fromJSON(json_str: str) -> 'UserRequest':
@@ -54,6 +55,7 @@ class UserRequest(JsonConvertible):
         data = json.loads(json_str)
         
         type_ = data.get("type", "userRequest")
+        thread_ = data.get("thread_id", "default")
         fields = data.get("fields", {})
         input_ = fields.get("input", "")
         linked = fields.get("linked", [])
@@ -209,7 +211,8 @@ class HumanMessageJson(JsonConvertible):
 class UserAnswer(JsonConvertible):
     def __init__(
         self, 
-        output:str, 
+        output:str,
+        thread_id:str,
         linked:list[str]=[],
         steps:list[ToolMessageJson|AIMessageJson|HumanMessageJson]=[]
     ):
@@ -222,11 +225,13 @@ class UserAnswer(JsonConvertible):
             steps (list[BrainStep], optional): Though steps, or history. Defaults to [].
         """
         self.output = output
+        self.threadId = thread_id
         self.linked = linked
         self.steps = [step.dict for step in steps]
 
         self.dict = {
             "type": "UserAnswer",
+            "thread_id": self.threadId,
             "fields": {
                 "output": self.output,
                 "linked": self.linked,

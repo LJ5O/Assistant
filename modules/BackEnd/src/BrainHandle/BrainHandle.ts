@@ -1,6 +1,6 @@
 import { spawn, ChildProcessWithoutNullStreams } from "child_process";
 
-import {UserRequest, UserAnswer} from './Types'
+import {UserRequest, UserAnswer} from '../Types/BrainHandle'
 import { rejects } from "assert";
 
 export class BrainManager {

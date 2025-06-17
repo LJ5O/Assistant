@@ -1,6 +1,7 @@
 // User request to Brain
 export interface UserRequest {
   type: "UserRequest";
+  thread_id: string;
   fields: {
     input: string;
     linked: string[];
@@ -49,6 +50,7 @@ export interface ToolMessage {
 // Answer from Brain
 export interface UserAnswer {
   type: "UserAnswer";
+  thread_id: string;
   fields: {
     output: string;
     linked: string[];
