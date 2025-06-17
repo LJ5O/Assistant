@@ -57,8 +57,9 @@ export class BrainManager {
     this.process.stdin.write(input + "\n");
   }
 
-  ask(input: UserRequest): void {
+  async ask(input: UserRequest): Promise<UserAnswer> {
     this.send(JSON.stringify(input));
+    return JSON.parse(await this.getAnswerFromBrain(5000, input.thread_id))
   }
 
   stop(): void {
@@ -78,6 +79,7 @@ export class BrainManager {
 
       let stop = false; // Timeout stop, stops the recursive check
       let found = false; // Found : stops the timeout rejection
+      let timeoutId: NodeJS.Timeout // So we can clear this timeout when finished
       const check = ()=>{
         if(stop)return; // Timeout reached
 
@@ -86,6 +88,7 @@ export class BrainManager {
             const msg:string = this.messagesFile[0] // Just take the first one
             this.messagesFile.splice(0,1); // Remove the message we just took
             found = true;
+            clearTimeout(timeoutId)
             resolve((''+msg).trim()); // msg may be a Buffer, ''+ is used to convert it to String
           }else if(this.messagesFile.length>0 && threadIdFilter){
 
@@ -95,6 +98,7 @@ export class BrainManager {
                 if(JSON.parse(v).thread_id == threadIdFilter){
                   this.messagesFile.splice(i,1); // We found the message we were looking for !
                   found = true;
+                  clearTimeout(timeoutId)
                   resolve((''+v).trim());
                 }
               }catch{}
@@ -108,7 +112,7 @@ export class BrainManager {
         }
       }
 
-      setTimeout(()=>{
+      timeoutId = setTimeout(()=>{
         stop = true;
         if(!found)reject(new Error("Timeout for answer awaiting"));
       }, timeoutMs);

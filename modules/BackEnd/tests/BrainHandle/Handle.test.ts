@@ -28,7 +28,7 @@ describe('Python subprocess can be used', () => {
         expect(brain.getSubprocess()).not.toBeNull()
     });
 
-    test('We can send a request to the subprocess', () => {
+    test('We can send a request to the subprocess', async () => {
         const input:UserRequest = {
             type: "UserRequest",
             thread_id: "default",
@@ -37,12 +37,8 @@ describe('Python subprocess can be used', () => {
                 linked: []
             }
         }
-        brain.ask(input)
-        brain.getAnswerFromBrain(2000, "default")
-        .then((answer)=>{
-            const output:UserAnswer = JSON.parse(answer)
-            expect(output.fields.output).toBe('OK')
-        })
+        const output:UserAnswer = await brain.ask(input)
+        expect(output.fields.output).toBe('OK')
     });
 
     test('Waiting without any message available rejects', () => {

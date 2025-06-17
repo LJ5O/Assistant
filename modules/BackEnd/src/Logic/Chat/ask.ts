@@ -19,14 +19,11 @@ export function ask(req:AuthenticatedRequest, res:Response, brain:BrainManager):
         }
 
         brain.ask(request)
-        brain.getAnswerFromBrain(30000)// Reduce this TODO
-        .then(data=>{
-            //TODO : Check that answer is REALLY for this client
-            const output:UserAnswer = JSON.parse(data);
-            res.status(200).json(output)
+        .then(answer => {
+            res.status(200).json(answer as UserAnswer)
         })
         .catch(_=>{
-            res.status(504).json({ error: 'Timeout.' })
+            res.status(504).json({ error: 'Timeout.' }) // Known bug : Call with a LONG message that will timeout, and you have a lost subprocess message that nobody is awaiting
         })
 
     }else{
