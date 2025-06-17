@@ -1,6 +1,7 @@
 from .GraphBuilder import GraphBuilder
 
 from langchain_core.messages import SystemMessage, HumanMessage
+from langgraph.checkpoint.memory import MemorySaver
 
 class CompiledGraph():
     def __init__(self, graphBuiler:GraphBuilder):
@@ -11,7 +12,8 @@ class CompiledGraph():
             graphBuiler (GraphBuilder): A Graph builder, ready to be built.
         """
         self.__rawGraph = graphBuiler
-        self.__compiledGraph = graphBuiler.compile()
+        memory = MemorySaver()
+        self.__compiledGraph = graphBuiler.compile(checkpointer=memory)
 
     def getGraph(self):
         """
