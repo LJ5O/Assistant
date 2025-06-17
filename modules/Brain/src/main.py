@@ -22,8 +22,9 @@ class Brain():
             self.__modelVersion = model_version
             self.__LLM = LLM(self.__modelVersion)
             
-        except:
-            sys.stderr.write("$error$ : can't start or load the model ! Are you sure you gave a valid version ?") # TODO for better error management
+        except Exception as err:
+            sys.stderr.write("$error$ : can't start or load the model ! Are you sure you gave a valid version ?\n") # TODO for better error management
+            sys.stderr.write(str(err)+'\n')
             return # Don't start the loop, stops here
         
         # Start the work loop !

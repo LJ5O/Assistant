@@ -1,6 +1,7 @@
 from langgraph.graph import StateGraph, START, END
 from langchain.tools import Tool, StructuredTool
 from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import MemorySaver
 
 from ..providers.Ollama import OllamaModel
 
@@ -40,6 +41,7 @@ class GraphBuilder():
         Returns:
             CompiledGraph: Graph ready to use
         """
-        self.__compiledGraph = self.__graphBuilder.compile()
+        memory = MemorySaver()
+        self.__compiledGraph = self.__graphBuilder.compile(checkpointer=memory)
         return self.__compiledGraph
 

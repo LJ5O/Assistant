@@ -1,7 +1,6 @@
 from .GraphBuilder import GraphBuilder
 
 from langchain_core.messages import SystemMessage, HumanMessage
-from langgraph.checkpoint.memory import MemorySaver
 
 class CompiledGraph():
     def __init__(self, graphBuiler:GraphBuilder):
@@ -12,8 +11,7 @@ class CompiledGraph():
             graphBuiler (GraphBuilder): A Graph builder, ready to be built.
         """
         self.__rawGraph = graphBuiler
-        memory = MemorySaver()
-        self.__compiledGraph = graphBuiler.compile(checkpointer=memory)
+        self.__compiledGraph = graphBuiler.compile()
 
     def getGraph(self):
         """
@@ -37,7 +35,7 @@ class CompiledGraph():
             if "messages" in event:
                 event["messages"][-1].pretty_print()
 
-    def submitInput(self, humanMessage:HumanMessage, systemMessage:SystemMessage=None):
+    def submitInput(self, humanMessage:HumanMessage, systemMessage:SystemMessage=None, threadId:str="default"):
         """
         A method that can be used to query the graph. Will Yield Graph outputs, ready to be worked on.
 
@@ -47,6 +45,7 @@ class CompiledGraph():
         Args:
             humanMessage (HumanMessage): Message from an Human user.
             systemMessage (SystemMessage, optional): System message, adding some optinal instructions or context. Defaults to None.
+            threadId (str, optional): Unique thread id, used for short term memory. Defaults to "default".
 
         Yields:
             Dict: Updates about the graph execution. Messages are under element['messages'].
@@ -54,4 +53,6 @@ class CompiledGraph():
         messages:list[HumanMessage|SystemMessage] = [humanMessage]
         if systemMessage: messages.append(systemMessage)
 
-        yield from self.getGraph().stream({"messages": messages}, {}, stream_mode="values")
+        config = {"configurable": {"thread_id": threadId}}
+
+        yield from self.getGraph().stream({"messages": messages}, config, stream_mode="values")

@@ -38,7 +38,7 @@ class Runner():
         messagesFromGraph: list[AIMessageJson, HumanMessageJson, ToolMessageJson] = []
         savedIDs: list[str] = []
 
-        for event in self.__graph.submitInput(humanMessage, systemMessage=sysMessage): # Waiting for events from the graph
+        for event in self.__graph.submitInput(humanMessage, systemMessage=sysMessage, threadId=request.threadId): # Waiting for events from the graph
             for message in event.get("messages", []):
                 if(message.id in savedIDs): continue # Already saved
 
@@ -55,4 +55,4 @@ class Runner():
                     raise NotImplementedError("Received an unknown message type !")
 
         # Graph execution ended, let's return the results :
-        return UserAnswer(messagesFromGraph[-1].content, steps=messagesFromGraph)
+        return UserAnswer(messagesFromGraph[-1].content, steps=messagesFromGraph, thread_id=request.threadId)
