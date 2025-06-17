@@ -28,7 +28,7 @@ function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextF
     });
 }
 
-export function defineRoutes(app:Express){
+export function defineRoutes(app:Express, brain:BrainManager){
     app.get('/hello', (req, res) => {
         authenticateToken(req, res, ()=>{
             res.json({ message: 'Hello World' });
@@ -49,10 +49,7 @@ export function defineRoutes(app:Express){
 
     app.post('/ask', (req:AuthenticatedRequest, res:Response) => {
         authenticateToken(req, res, ()=>{
-            const handle = new BrainManager("./../Brain/src/main.py")
-            handle.start()
-            ask(req, res, handle)
-            handle.stop()
+            ask(req, res, brain)
         });
     });
 
