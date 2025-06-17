@@ -3,6 +3,9 @@ import swaggerUi from 'swagger-ui-express';
 import jwt from 'jsonwebtoken';
 
 import {SWAGGER_CONFIG} from './swaggerConfig'
+
+import { ask } from '../Logic/Chat/ask'
+import { BrainManager } from '../BrainHandle/BrainHandle';
 const SECRET_KEY = 'change-moi'; // TODO : Move to env var or .env file
 
 function authenticateToken(req: Request, res: Response, next: NextFunction) {
@@ -40,6 +43,15 @@ export function defineRoutes(app:Express){
         } else {
             res.status(401).json({ error: 'Invalid credentials' });
         }
+    });
+
+    app.post('/ask', (req, res) => {
+        authenticateToken(req, res, ()=>{
+            const handle = new BrainManager("./../Brain/src/main.py")
+            handle.start()
+            ask(req, res, handle)
+            handle.stop()
+        });
     });
 
     app.use('/docs', swaggerUi.serve, swaggerUi.setup(SWAGGER_CONFIG));
