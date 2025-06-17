@@ -37,12 +37,8 @@ describe('Python subprocess can be used', () => {
                 linked: []
             }
         }
-        while(!brain.isReady()){
-            //Waiting for brain to be 100% ready ( "ready" received from subprocess )
-            console.log('waiting...')
-        }
         brain.ask(input)
-        brain.getAnswerFromBrain(2000)
+        brain.getAnswerFromBrain(2000, "default")
         .then((answer)=>{
             const output:UserAnswer = JSON.parse(answer)
             expect(output.fields.output).toBe('OK')

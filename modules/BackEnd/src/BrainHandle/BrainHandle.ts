@@ -69,7 +69,7 @@ export class BrainManager {
     }
   }
 
-  getAnswerFromBrain(timeoutMs:number = 5000): Promise<string>{
+  getAnswerFromBrain(timeoutMs:number = 5000, threadIdFilter:string|undefined = undefined): Promise<string>{
     /**
      * Awaits for a message to be available in the Brain messages arrivals waiting room.
      * It will be returned as a String
@@ -82,11 +82,24 @@ export class BrainManager {
         if(stop)return; // Timeout reached
 
         try{
-          if(this.messagesFile.length>0){ // A message arrived !
-            const msg:string = this.messagesFile[0]
+          if(this.messagesFile.length>0 && !threadIdFilter){ // A message arrived !
+            const msg:string = this.messagesFile[0] // Just take the first one
             this.messagesFile.splice(0,1); // Remove the message we just took
             found = true;
             resolve((''+msg).trim()); // msg may be a Buffer, ''+ is used to convert it to String
+          }else if(this.messagesFile.length>0 && threadIdFilter){
+
+            this.messagesFile.map((v,i)=>{
+              // We are looking for one message corresponding to the filter
+              try{
+                if(JSON.parse(v).thread_id == threadIdFilter){
+                  this.messagesFile.splice(i,1); // We found the message we were looking for !
+                  found = true;
+                  resolve((''+v).trim());
+                }
+              }catch{}
+            })
+
           }else{
             setTimeout(check, 100);
           }
