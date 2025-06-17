@@ -1,6 +1,7 @@
-import {describe, expect, test} from '@jest/globals';
+import {afterAll, beforeAll, describe, expect, test} from '@jest/globals';
 
 import {BrainManager} from '../../src/BrainHandle/BrainHandle'
+import {UserRequest, UserAnswer} from '../../src/BrainHandle/Types'
 
 describe('Python subprocess can be used', () => {
     let brain: BrainManager;
@@ -25,5 +26,26 @@ describe('Python subprocess can be used', () => {
     // ----- Tests on the subprocess -----
     test('Subprocess is up and ready', () => {
         expect(brain.getSubprocess()).not.toBeNull()
+    });
+
+    test('We can send a request to the subprocess', () => {
+        const input:UserRequest = {
+            type: "UserRequest",
+            fields: {
+                input: "Hello World!",
+                linked: []
+            }
+        }
+        brain.ask(input)
+        brain.getAnswerFromBrain(2000)
+        .then((answer)=>{
+            const output:UserAnswer = JSON.parse(answer)
+            expect(output.fields.output).toBe('OK')
+        })
+    });
+
+    test('Waiting without any message available rejects', () => {
+        const error = new Error("Timeout for answer awaiting")
+        expect(brain.getAnswerFromBrain(500)).rejects.toEqual(error)
     });
 });

@@ -58,7 +58,7 @@ class UserRequest(JsonConvertible):
         input_ = fields.get("input", "")
         linked = fields.get("linked", [])
 
-        return UserRequest(input=input_, Reqtype=type_, linked=linked)
+        return UserRequest(input=input_, linked=linked)
 
 class ToolCall(JsonConvertible):
 
