@@ -92,7 +92,7 @@ export const SWAGGER_CONFIG: SwaggerOptions = {
               properties: {
                 message: {
                   type: 'string',
-                  example: 'Bonjour, qui es-tu ?',
+                  example: 'What\' 2*2 ?',
                 },
               },
             },
