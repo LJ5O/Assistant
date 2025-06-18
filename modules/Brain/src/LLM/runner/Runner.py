@@ -3,7 +3,31 @@ import sys
 from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage, AIMessage
 
 from ..graph.CompiledGraph import CompiledGraph
-from Json.Types import UserRequest, UserAnswer, AIMessageJson, HumanMessageJson, ToolMessageJson
+from Json.Types import UserRequest, UserAnswer, AIMessageJson, HumanMessageJson, ToolMessageJson, History
+
+def LangChainMessageToJsonFriendlyMessage(message:HumanMessage|ToolMessage|AIMessage)->AIMessageJson|HumanMessageJson|ToolMessageJson:
+    """
+    Takes a message object from Langchain, and convert it to a Json friendly message
+
+    Args:
+        message (HumanMessage | ToolMessage | AIMessage): Message from LangChain
+
+    Raises:
+        NotImplementedError: In case you sent a message not supported
+
+    Returns:
+        AIMessageJson|HumanMessageJson|ToolMessageJson: Converted message
+    """
+    if(type(message) == HumanMessage):
+        return (HumanMessageJson.fromHumanMessage(message))
+    elif(type(message) == AIMessage):
+        return (AIMessageJson.fromAIMessage(message))
+    elif(type(message) == ToolMessage):
+        return (ToolMessageJson.fromToolMessage(message))
+    else:
+        # Unknwown message type !
+        # Related : https://python.langchain.com/docs/concepts/messages/
+        raise NotImplementedError("Received an unknown message type !")
 
 class Runner():
     """
@@ -43,16 +67,24 @@ class Runner():
                 if(message.id in savedIDs): continue # Already saved
 
                 savedIDs.append(message.id) # So we don't save it twice
-                if(type(message) == HumanMessage):
-                    messagesFromGraph.append(HumanMessageJson.fromHumanMessage(message))
-                elif(type(message) == AIMessage):
-                    messagesFromGraph.append(AIMessageJson.fromAIMessage(message))
-                elif(type(message) == ToolMessage):
-                    messagesFromGraph.append(ToolMessageJson.fromToolMessage(message))
-                else:
-                    # Unknwown message type !
-                    # Related : https://python.langchain.com/docs/concepts/messages/
-                    raise NotImplementedError("Received an unknown message type !")
+                messagesFromGraph.append(LangChainMessageToJsonFriendlyMessage(message))
 
         # Graph execution ended, let's return the results :
         return UserAnswer(messagesFromGraph[-1].content, steps=messagesFromGraph, thread_id=request.threadId)
+
+    def getHistory(self, threadId:str) -> History:
+        """
+        Get the messages associated with a given thread id
+
+        Args:
+            threadId (str): Unique ID for a thread
+
+        Returns:
+            History: Messages in this conversation
+        """
+        messages = self.__graph.getHistory(threadId)
+        JsonFriendlyMessages = []
+
+        for message in messages:
+            JsonFriendlyMessages.append(LangChainMessageToJsonFriendlyMessage(message))
+        return History(threadId, JsonFriendlyMessages)

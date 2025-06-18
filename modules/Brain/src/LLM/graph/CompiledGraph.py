@@ -1,6 +1,7 @@
 from .GraphBuilder import GraphBuilder
+from langgraph.checkpoint.memory import MemorySaver
 
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, ToolMessage
 
 class CompiledGraph():
     def __init__(self, graphBuiler:GraphBuilder):
@@ -11,7 +12,8 @@ class CompiledGraph():
             graphBuiler (GraphBuilder): A Graph builder, ready to be built.
         """
         self.__rawGraph = graphBuiler
-        self.__compiledGraph = graphBuiler.compile()
+        self.__memory = MemorySaver()
+        self.__compiledGraph = graphBuiler.compile(self.__memory)
 
     def getGraph(self):
         """
@@ -56,3 +58,15 @@ class CompiledGraph():
         config = {"configurable": {"thread_id": threadId}}
 
         yield from self.getGraph().stream({"messages": messages}, config, stream_mode="values")
+
+    def getHistory(self, threadId:str)->list[HumanMessage|AIMessage|ToolMessage|SystemMessage]:
+        """
+        Get the messages history for a given thread ID
+
+        Args:
+            threadId (str): Unique identifier for a thread
+
+        Returns:
+            list[HumanMessage|AIMessage|ToolMessage|SystemMessage]: List including all recent messages here.
+        """
+        return self.__memory.get({"configurable": {"thread_id": threadId}})['channel_values'].get('messages', [])

@@ -34,14 +34,13 @@ class GraphBuilder():
         # Any time a tool is called, we return to the chatbot to decide the next step
         self.__graphBuilder.add_edge("tools", "chatbot")                                  
 
-    def compile(self):
+    def compile(self, memory:MemorySaver):
         """
         Validates the current Graph, and compile it, so we can start answering
 
         Returns:
             CompiledGraph: Graph ready to use
         """
-        memory = MemorySaver()
         self.__compiledGraph = self.__graphBuilder.compile(checkpointer=memory)
         return self.__compiledGraph
 

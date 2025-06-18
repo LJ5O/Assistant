@@ -2,13 +2,14 @@ import sys
 from LLM.LLM import LLM
 
 from Json.utils import processInput
+from Json.Types import UserRequest, UserAnswer
 
 class Brain():
     """
     Class used to manage the LLM in charge of the AI.
     """
 
-    def __init__(self, model_version:str, prelude:str=""):
+    def __init__(self, model_version:str, prelude:str="", test:bool=False):
         """
         Instanciate a new Brain object, that is the central place where we manage the text generation model
         Usually ran as a subprocess. If model is successfully loaded, we directly start the processing loop.
@@ -16,11 +17,13 @@ class Brain():
         Args:
             model_version (str): What version of GPT4All model should we use ?
             prelude (str): A text included everytime we ask something to the AI. Defaults to \"\"
+            test (bool): Manual test mode, don't use this unless you know what you are doing. Defaults to False
         """
         try:
             self.__prelude = prelude # TODO, useless
             self.__modelVersion = model_version
             self.__LLM = LLM(self.__modelVersion)
+            self.__TEST = test
             
         except Exception as err:
             sys.stderr.write("$error$ : can't start or load the model ! Are you sure you gave a valid version ?\n") # TODO for better error management
@@ -45,11 +48,25 @@ class Brain():
             if command.lower() == "exit": 
                 break
 
-            request = processInput(command) # JSON -> Object
-            answer = self.__LLM.getRunner().handleUserRequest(request) # Processing
-            print(answer.toJSON()) # Answer object -> JSON
-            sys.stdout.flush()
+            if not self.__TEST:
+                # Classical behavior
+                request:UserRequest = processInput(command) # JSON -> Object
+                answer:UserAnswer = self.__LLM.getRunner().handleUserRequest(request) # Processing
+                print(answer.toJSON()) # Answer object -> JSON
+                sys.stdout.flush()
+            
+            else:
+                # TEST MODE
+                # Inputs are no longer JSON, but simple strings, easier to test manually in console
+                # Have fun !
+                thread_id = "test"
 
+                request = UserRequest(command, thread_id)
+                answer = self.__LLM.getRunner().handleUserRequest(request) # Processing
+                print(answer.toJSON()) # Answer object -> JSON
+                print('-'*25)
+                print(self.__LLM.getRunner().getHistory(thread_id).toJSON())
+                sys.stdout.flush()
 
 # -------------------
 
@@ -59,6 +76,7 @@ def printHelp():
     print("Valid args :\n")
     print("-m <Model> : Models from Ollama, or 'test' for testing purposes")
     print("-p \"[The text you want to append at the begining of every request made to the AI.]\" : That's a good place to remember it to answer as you like. ")
+    print("-t <true|false> : General testing mode, you should not use this unless you are testing manually the system")
 
 if __name__ == "__main__":
 
@@ -69,6 +87,7 @@ if __name__ == "__main__":
     # Defining default values
     model_to_use:str = "llama3.1:8b" # -m
     prelude:str = "" # -p
+    test:bool = False # -t
 
     for i in range(1, len(sys.argv), 2):
         arg = sys.argv[i]
@@ -80,8 +99,11 @@ if __name__ == "__main__":
         elif arg == "-p":
             prelude = value
 
+        elif arg == "-t":
+            test = True if value == "true" else False
+
     # We're now ready to start the real work here !
-    manager = Brain(model_version=model_to_use, prelude=prelude)
+    manager = Brain(model_version=model_to_use, prelude=prelude, test=test)
 
 # The idea for it to work :
 # 1 - This file is launched as a subprocess

@@ -57,3 +57,9 @@ export interface UserAnswer {
     steps: (HumanMessage|AIMessage|ToolMessage)[];
   };
 }
+
+export interface History {
+  type: "History",
+  thread_id: string,
+  messages: (HumanMessage|AIMessage|ToolMessage)[]
+}

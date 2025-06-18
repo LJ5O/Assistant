@@ -238,3 +238,13 @@ class UserAnswer(JsonConvertible):
                 "steps": self.steps
             }
         }
+
+class History(JsonConvertible):
+    def __init__(self, threadId:str, messages:list[HumanMessageJson|AIMessageJson|ToolMessageJson]):
+        self.messages = messages
+        self.threadId = threadId
+        self.dict = {
+            "type": "History",
+            "thread_id": self.threadId,
+            "messages": [m.dict for m in self.messages]
+        }

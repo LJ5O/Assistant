@@ -53,5 +53,11 @@ export function defineRoutes(app:Express, brain:BrainManager){
         });
     });
 
+    app.post('/history', (req:AuthenticatedRequest, res:Response) => {
+        authenticateToken(req, res, ()=>{
+            ask(req, res, brain)
+        });
+    });
+
     app.use('/docs', swaggerUi.serve, swaggerUi.setup(SWAGGER_CONFIG));
 }
