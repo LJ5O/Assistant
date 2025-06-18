@@ -1,7 +1,7 @@
 import {afterAll, beforeAll, describe, expect, test} from '@jest/globals';
 
 import {BrainManager} from '../../src/BrainHandle/BrainHandle'
-import {UserRequest, UserAnswer} from '../../src/Types/BrainHandle'
+import {UserRequest, UserAnswer, History, HistoryRequest} from '../../src/Types/BrainHandle'
 
 describe('Python subprocess can be used', () => {
     let brain: BrainManager;
@@ -39,6 +39,33 @@ describe('Python subprocess can be used', () => {
         }
         const output:UserAnswer = await brain.ask(input)
         expect(output.fields.output).toBe('OK')
+    });
+
+    test('Message history can be retrieved', async () => {
+        const input:UserRequest = {
+            type: "UserRequest",
+            thread_id: "default",
+            fields: {
+                input: "Hello History !",
+                linked: []
+            }
+        }
+        await brain.ask(input) // Message is sent to subprocess
+
+        const historyRequest:HistoryRequest = {
+            type: "HistoryRequest",
+            thread_id: "default"
+        }
+        const hist:History = await brain.askHistory(historyRequest) // And now, we try to get it from the history request
+        let userMessages:string[] = []
+
+        for(let i=0; i<hist.messages.length; i++){
+            if(hist.messages[i].type == "HumanMessage"){
+                userMessages.push(hist.messages[i].content)
+            }
+        }
+
+        expect(userMessages).toContain("Hello History !")
     });
 
     test('Waiting without any message available rejects', () => {
