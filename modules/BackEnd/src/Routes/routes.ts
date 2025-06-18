@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import {SWAGGER_CONFIG} from './swaggerConfig'
 
 import { ask } from '../Logic/Chat/ask'
+import { history } from '../Logic/Chat/history'
 import { BrainManager } from '../BrainHandle/BrainHandle';
 import { UserData, AuthenticatedRequest } from '../Types/API';
 
@@ -53,9 +54,9 @@ export function defineRoutes(app:Express, brain:BrainManager){
         });
     });
 
-    app.post('/history', (req:AuthenticatedRequest, res:Response) => {
+    app.get('/history', (req:AuthenticatedRequest, res:Response) => {
         authenticateToken(req, res, ()=>{
-            ask(req, res, brain)
+            history(req, res, brain)
         });
     });
 

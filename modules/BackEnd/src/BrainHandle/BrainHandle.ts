@@ -1,7 +1,6 @@
 import { spawn, ChildProcessWithoutNullStreams } from "child_process";
 
-import {UserRequest, UserAnswer} from '../Types/BrainHandle'
-import { rejects } from "assert";
+import {UserRequest, UserAnswer, HistoryRequest, History} from '../Types/BrainHandle'
 
 export class BrainManager {
     
@@ -58,6 +57,11 @@ export class BrainManager {
   }
 
   async ask(input: UserRequest): Promise<UserAnswer> {
+    this.send(JSON.stringify(input));
+    return JSON.parse(await this.getAnswerFromBrain(5000, input.thread_id))
+  }
+
+  async askHistory(input: HistoryRequest): Promise<History> { // TODO : Merge the two ask methods
     this.send(JSON.stringify(input));
     return JSON.parse(await this.getAnswerFromBrain(5000, input.thread_id))
   }

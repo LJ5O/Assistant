@@ -63,3 +63,8 @@ export interface History {
   thread_id: string,
   messages: (HumanMessage|AIMessage|ToolMessage)[]
 }
+
+export interface HistoryRequest {
+  type: "HistoryRequest",
+  thread_id: string
+}

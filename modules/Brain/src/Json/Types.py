@@ -248,3 +248,27 @@ class History(JsonConvertible):
             "thread_id": self.threadId,
             "messages": [m.dict for m in self.messages]
         }
+
+class HistoryRequest(JsonConvertible):
+    def __init__(self, threadId:str):
+        self.threadId = threadId
+        self.dict = {
+            "type": "HistoryRequest",
+            "thead_id": threadId
+        }
+
+    @staticmethod
+    def fromJSON(json_str: str) -> 'HistoryRequest':
+        """
+        Parse a JSON string to create a HistoryRequest instance
+
+        Args:
+            json_str (str): JSON string to parse
+
+        Returns:
+            UserRequest: instance created from JSON data
+        """
+        data = json.loads(json_str)
+        
+        thread_ = data['thread_id']
+        return HistoryRequest(thread_)

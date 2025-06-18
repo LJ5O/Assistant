@@ -1,29 +1,24 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../../Types/API';
 import {BrainManager} from '../../BrainHandle/BrainHandle'
-import { UserRequest, UserAnswer, History } from '../../Types/BrainHandle';
+import { History, HistoryRequest } from '../../Types/BrainHandle';
 
 export function history(req:AuthenticatedRequest, res:Response, brain:BrainManager):void{
-    if(req.body?.message && req.user?.login){
+    if(req.user?.login){
 
-        const message = req.body.message as string // TODO : Avoid injections from clients that could cause trouble
         const userId = req.user.login as string
 
-        const request: UserRequest = {
-            type: "UserRequest",
-            thread_id: userId,
-            fields: {
-                input: message,
-                linked: []
-            }
+        const request: HistoryRequest = {
+            type: "HistoryRequest",
+            thread_id: userId
         }
 
-        brain.ask(request)
+        brain.askHistory(request)
         .then(answer => {
-            res.status(200).json(answer as UserAnswer)
+            res.status(200).json(answer as History)
         })
         .catch(_=>{
-            res.status(504).json({ error: 'Timeout.' }) // Known bug : Call with a LONG message that will timeout, and you have a lost subprocess message that nobody is awaiting
+            res.status(504).json({ error: 'Timeout.' })
         })
 
     }else{

@@ -124,5 +124,60 @@ export const SWAGGER_CONFIG: SwaggerOptions = {
         },
       },
     },
+    '/history': {
+      get: {
+        summary: 'Récupère l’historique des échanges',
+        description: 'Retourne l’historique des messages entre l’utilisateur et le cerveau IA.',
+        security: [{ Bearer: [] }],
+        responses: {
+          200: {
+            description: 'Historique des messages',
+            schema: {
+              type: 'object',
+              properties: {
+                type: { type: 'string', example: 'History' },
+                thread_id: { type: 'string', example: 'user@example.com' },
+                messages: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      type: { type: 'string', example: 'HumanMessage' },
+                      content: { type: 'string', example: 'Hello, who are you?' },
+                      name: { type: 'string', example: 'user', nullable: true },
+                      tool_call_id: { type: 'string', nullable: true },
+                      tool_call_type: { type: 'string', nullable: true },
+                      tool_call_args: {
+                        type: 'object',
+                        nullable: true,
+                        additionalProperties: true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          422: {
+            description: 'Utilisateur non authentifié ou identifiant manquant',
+            schema: {
+              type: 'object',
+              properties: {
+                error: { type: 'string', example: 'Missing or invalid fields in body.' }
+              }
+            }
+          },
+          504: {
+            description: 'Pas de réponse (timeout)',
+            schema: {
+              type: 'object',
+              properties: {
+                error: { type: 'string', example: 'Timeout.' }
+              }
+            }
+          }
+        }
+      }
+    },
   },
 };

@@ -2,7 +2,7 @@ import sys
 from LLM.LLM import LLM
 
 from Json.utils import processInput
-from Json.Types import UserRequest, UserAnswer
+from Json.Types import UserRequest, UserAnswer, HistoryRequest
 
 class Brain():
     """
@@ -50,8 +50,14 @@ class Brain():
 
             if not self.__TEST:
                 # Classical behavior
-                request:UserRequest = processInput(command) # JSON -> Object
-                answer:UserAnswer = self.__LLM.getRunner().handleUserRequest(request) # Processing
+                request = processInput(command) # JSON -> Object
+                if(type(request) is UserRequest):
+                    answer:UserAnswer = self.__LLM.getRunner().handleUserRequest(request) # Processing
+                elif(type(request) is HistoryRequest):
+                    answer:UserAnswer = self.__LLM.getRunner().getHistory(request.threadId)
+                else:
+                    raise NotImplementedError("Unknown command !")
+                
                 print(answer.toJSON()) # Answer object -> JSON
                 sys.stdout.flush()
             
@@ -64,8 +70,6 @@ class Brain():
                 request = UserRequest(command, thread_id)
                 answer = self.__LLM.getRunner().handleUserRequest(request) # Processing
                 print(answer.toJSON()) # Answer object -> JSON
-                print('-'*25)
-                print(self.__LLM.getRunner().getHistory(thread_id).toJSON())
                 sys.stdout.flush()
 
 # -------------------

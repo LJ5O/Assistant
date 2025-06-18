@@ -69,4 +69,8 @@ class CompiledGraph():
         Returns:
             list[HumanMessage|AIMessage|ToolMessage|SystemMessage]: List including all recent messages here.
         """
-        return self.__memory.get({"configurable": {"thread_id": threadId}})['channel_values'].get('messages', [])
+        try:
+            return self.__memory.get({"configurable": {"thread_id": threadId}})['channel_values'].get('messages', [])
+        except:
+            # We never for any messages from this ID, let's return an empty list
+            return []
