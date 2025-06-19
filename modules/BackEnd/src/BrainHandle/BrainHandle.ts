@@ -31,6 +31,8 @@ export class BrainManager {
     this.process.on("close", (code) => {
       console.log(`Python process exited with code ${code}`);
       this.process = null;
+      this.ready = false;
+      process.exit(1);
     });
 
     // Check for Brain start
