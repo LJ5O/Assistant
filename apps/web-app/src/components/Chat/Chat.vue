@@ -39,9 +39,10 @@
                 class="h-full flex-1 bg-transparent resize-none border-none outline-none ring-0"
                 placeholder="Type something..."
                 :disabled="inputDisabled"
+                id="message-input"
             />
 
-            <div class="h-full w-fit ml-2" @click="sendUserMessageToBack">
+            <div class="h-full w-fit ml-2" id="message-send" @click="sendUserMessageToBack">
                 <Icon icon="solar:plain-2-line-duotone" class="h-full text-4xl mr-2 hover:text-neutral-500 text-center"/>
             </div>
 
