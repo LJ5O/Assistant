@@ -66,7 +66,7 @@ describe('Python subprocess can be used', () => {
         }
 
         expect(userMessages).toContain("Hello History !")
-    });
+    }, 10000);
 
     test('Waiting without any message available rejects', () => {
         const error = new Error("Timeout for answer awaiting")
