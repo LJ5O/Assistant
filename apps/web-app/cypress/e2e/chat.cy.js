@@ -53,9 +53,21 @@ const answer = {
   }
 }
 
+const history = {
+  "type": "History",
+  "thread_id": "admin",
+  "messages": [
+    {
+      "type": "HumanMessage",
+      "content": "Test OK",
+      "id": "17edf288-d3a5-4a3b-b84a-51282b1bdf9b"
+    }
+  ]
+}
+
 describe('Chat with Agent', () => {
 
-    it('Can open the chat page', () => {
+    it('Can open the chat page with a JWT saved', () => {
       cy.window().then((win) => {
         // Set the user object in the sessionStorage
         win.sessionStorage.setItem("jwt", "aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc"); // Valid exp expiring in 2100
@@ -63,11 +75,38 @@ describe('Chat with Agent', () => {
       cy.visit('/control')
       cy.location('pathname').should('eq', '/control')
     })
+
+    it('Can NOT open the chat page without a JWT saved', () => {
+      cy.visit('/control')
+      cy.location('pathname').should('eq', '/')
+    })
+
+    it('Can get an History of all messages sent when opening', () => {
+      cy.window().then((win) => {
+        // Set the user object in the sessionStorage
+        win.sessionStorage.setItem("jwt", "aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc"); // Valid exp expiring in 2100
+      });
+
+      cy.intercept('GET', '/history', {
+        statusCode: 200,
+        body: history
+      }).as('mockAsk');
+
+      cy.visit('/control') // History is auto loaded when oppening
+      cy.get('.human-message > .text-xs > p').contains('Test OK') // So we just have to wait for this
+
+
+    })
   
     it('Messages element are displaying properly', () => {
       cy.window().then((win) => {
         win.sessionStorage.setItem("jwt", "aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc");
       });
+
+      cy.intercept('GET', '/history', { // So this doesn't mess with our test
+        statusCode: 200,
+        body: history
+      }).as('mockHist');
 
       cy.intercept('POST', '/ask', {
         statusCode: 200,

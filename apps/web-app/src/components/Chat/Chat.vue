@@ -5,8 +5,8 @@
 
     import Input from '../Form/Input.vue'
     import Message from './ChatComponent/Message.vue'
-    import { sendMessage } from '../../API/Messages'
-    import type { HumanMessage, AIMessage, ToolMessage, UserAnswer } from '../../API/Types/Types'
+    import { sendMessage, getHistory } from '../../API/Messages'
+    import type { HumanMessage, AIMessage, ToolMessage, UserAnswer, History } from '../../API/Types/Types'
 
     const userMessage = ref<string>('')
     const messagesList = ref<(HumanMessage|AIMessage|ToolMessage)[]>([])
@@ -15,12 +15,27 @@
     const sendUserMessageToBack = async ()=>{
         inputDisabled.value = true;
         const answer:UserAnswer = await sendMessage(userMessage.value) //TODO try catch
+        messagesList.value = []
         answer.fields.steps.forEach(message => {
             messagesList.value.push(message)
         });
         inputDisabled.value = false;
         userMessage.value = '';
     }
+
+    const getPastMessages = ()=>{
+        getHistory()
+        .then((hist:History) => {
+            messagesList.value = []
+            hist.messages.forEach(message => {
+                messagesList.value.push(message)
+            });
+        })
+        .catch(err=>{
+            console.error(err) // TODO : display error
+        })
+    }
+    getPastMessages()
 
 </script>
 

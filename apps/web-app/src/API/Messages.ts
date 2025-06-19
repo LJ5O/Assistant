@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { getStoredToken } from './Utils'
-import type { UserAnswer } from './Types/Types'
+import type { UserAnswer, History } from './Types/Types'
 
 export async function sendMessage(message:string):Promise<UserAnswer>{
     /**
@@ -27,6 +27,31 @@ export async function sendMessage(message:string):Promise<UserAnswer>{
             
         const data:UserAnswer = answer.data
         if(data.type!=="UserAnswer") throw new Error("Type of object we received is not the one we are waiting for !");
+        return answer.data
+    }catch(err){
+        throw err
+    }
+}
+
+export async function getHistory() {
+    /**
+     * Get the list of all sent messages
+     */
+    const token = getStoredToken()
+    if(!token){
+        console.error("Please, login again before using the app !")
+        throw new Error("No valid token")
+    }
+
+    try{
+        const answer = await axios.get('http://127.0.0.1:3000/history',
+            {// Config
+                timeout: 10000,//10s
+                headers: {authorization: token}// Auth header is mandatory
+            })
+            
+        const data:History = answer.data
+        if(data.type!=="History") throw new Error("Type of object we received is not the one we are waiting for !");
         return answer.data
     }catch(err){
         throw err
