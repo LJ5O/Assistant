@@ -21,7 +21,7 @@
           sessionStorage.setItem('jwt', answer.data.token)
           console.log("Login OK ! ")
           console.warn("TODO : remove me. Token is "+answer.data.token)
-          router.push('/control');
+          router.push('/talk');
 
         }).catch((err)=>{
           console.error(err)

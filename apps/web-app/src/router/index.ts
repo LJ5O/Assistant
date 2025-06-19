@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { getStoredToken } from '../API/Utils'
 
 import Login from '../views/Login.vue'
-import Control from '../views/Control.vue'
+import Talk from '../views/Talk.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,9 +12,9 @@ const router = createRouter({
       name: 'login',
       component: Login,
     },{
-      path: '/control',
-      name: 'control',
-      component: Control,
+      path: '/talk',
+      name: 'talk',
+      component: Talk,
       meta: { requiresAuth: true }
     }/*,
     {

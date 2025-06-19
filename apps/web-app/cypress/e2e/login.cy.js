@@ -18,7 +18,7 @@ describe('Login form', () => {
       });
     });
     // We should move to another page
-    cy.location('pathname').should('eq', '/control') // API docs : https://docs.cypress.io/api/commands/location
+    cy.location('pathname').should('eq', '/talk') // API docs : https://docs.cypress.io/api/commands/location
     cy.get("#login-error-div").should('not.exist')
 
   })

@@ -72,12 +72,12 @@ describe('Chat with Agent', () => {
         // Set the user object in the sessionStorage
         win.sessionStorage.setItem("jwt", "aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc"); // Valid exp expiring in 2100
       });
-      cy.visit('/control')
-      cy.location('pathname').should('eq', '/control')
+      cy.visit('/talk')
+      cy.location('pathname').should('eq', '/talk')
     })
 
     it('Can NOT open the chat page without a JWT saved', () => {
-      cy.visit('/control')
+      cy.visit('/talk')
       cy.location('pathname').should('eq', '/')
     })
 
@@ -92,7 +92,7 @@ describe('Chat with Agent', () => {
         body: history
       }).as('mockAsk');
 
-      cy.visit('/control') // History is auto loaded when oppening
+      cy.visit('/talk') // History is auto loaded when oppening
       cy.get('.human-message > .text-xs > p').contains('Test OK') // So we just have to wait for this
 
 
@@ -113,7 +113,7 @@ describe('Chat with Agent', () => {
         body: answer
       }).as('mockAsk');
 
-      cy.visit('/control')
+      cy.visit('/talk')
       cy.get('#message-input').type('What\'s 2*2 ?')
       cy.get('#message-send').click()
 
