@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useRouter } from 'vue-router';
 
 import { getStoredToken } from './Utils'
 import type { UserAnswer } from './Types/Types'
@@ -13,8 +12,6 @@ export async function sendMessage(message:string):Promise<UserAnswer>{
     const token = getStoredToken()
     if(!token){
         console.error("Please, login again before using the app !")
-        const router = useRouter()
-        router.push('/');
         throw new Error("No valid token")
     }
 

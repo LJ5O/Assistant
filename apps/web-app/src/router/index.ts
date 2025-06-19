@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { getStoredToken } from '../API/Utils'
+
 import Login from '../views/Login.vue'
 import Control from '../views/Control.vue'
 
@@ -27,7 +29,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const token = sessionStorage.getItem('jwt');
+  const token = getStoredToken()
 
   if(to.meta.requiresAuth && !token){
     next('/'); // Token is not available => login

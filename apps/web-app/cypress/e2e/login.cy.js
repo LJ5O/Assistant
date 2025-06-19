@@ -3,7 +3,7 @@ describe('Login form', () => {
 
     cy.intercept('POST', '/login', { // Interception of request to /login
       statusCode: 200,
-      body: { token: 'abc.123.xyz' }
+      body: { token: 'aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc' }
     }).as('mockLogin');
 
     cy.visit('/')
