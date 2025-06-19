@@ -1,10 +1,12 @@
 from langchain.tools import Tool, StructuredTool
 
 from .math.Multiply import getTool as MultiplyTool
+from .misc.Nothing import getTool as NothingTool
 
 class Tools():
 
     multiply:Tool = MultiplyTool()
+    nothing:Tool = NothingTool()
 
     @staticmethod
     def getAll()->list[Tool | StructuredTool]:
@@ -15,5 +17,6 @@ class Tools():
             list[Tool | StructuredTool]: ALL defined tools
         """
         return [
-            MultiplyTool()
+            MultiplyTool(),
+            NothingTool()
         ]

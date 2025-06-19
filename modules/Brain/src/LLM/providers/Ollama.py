@@ -29,10 +29,12 @@ class OllamaModel():
         """
         try:
             return ChatOllama(
-            model=self.__modelName,
-            #system="Ne propose d'utiliser des outils que si la demande l'exige clairement. Sinon, réponds directement.",
-            temperature=self.__temperature # 
-        ).bind_tools(self.__tools)
+                model=self.__modelName,
+                #system="Ne propose d'utiliser des outils que si la demande l'exige clairement. Sinon, réponds directement.",
+                temperature=self.__temperature # 
+            ).bind_tools(self.__tools, tool_choice='auto')
+            # See https://python.langchain.com/docs/how_to/tool_calling/
+            # See https://python.langchain.com/api_reference/openai/chat_models/langchain_openai.chat_models.base.BaseChatOpenAI.html#langchain_openai.chat_models.base.BaseChatOpenAI.bind_tools
         
         except Exception as err:
             sys.stderr.write(f"ERROR : Please, ensure Ollama is up and running on your computer :\n {err}")
