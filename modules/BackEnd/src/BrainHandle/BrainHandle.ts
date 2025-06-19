@@ -32,7 +32,7 @@ export class BrainManager {
       console.log(`Python process exited with code ${code}`);
       this.process = null;
       this.ready = false;
-      process.exit(1);
+      if(code!=0) process.exit(1);
     });
 
     // Check for Brain start
