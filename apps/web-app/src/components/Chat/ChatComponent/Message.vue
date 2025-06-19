@@ -3,32 +3,38 @@
 import {computed} from 'vue';
 import { Icon } from "@iconify/vue";
 
+import HumanMessageDisplay from './MessagesTypes/HumanMessageDisplay.vue'
+import AgentMessageDisplay from './MessagesTypes/AgentMessageDisplay.vue'
+import ToolMessageDisplay from './MessagesTypes/ToolMessageDisplay.vue'
+import type { HumanMessage, AIMessage, ToolMessage } from '../../../API/Types/Types'
+
 interface Props{
-    content: string,
-    role: 'user'|'chatbot',
+    message: (HumanMessage|AIMessage|ToolMessage)
     avatar?: string
 }
-
 const props = defineProps<Props>()
 
-const avatarIcon = computed(() => {
-  return props.avatar || (props.role === 'user'
-    ? 'solar:user-circle-line-duotone'
-    : 'solar:face-scan-square-line-duotone')
+const role = computed(() => {
+    switch (props.message.type) {
+        case "HumanMessage":
+            return "human"
+            break;
+        case "AIMessage":
+            return "agent"
+            break;
+        case "ToolMessage":
+            return "tool"
+            break;
+        default:
+            return ""
+            break;
+    }
 })
+
 </script>
 
 <template>
-    <div 
-        class="flex gap-5 mb-4 mt-2"
-        :class="role=='user' ? 'flex-row-reverse ml-5 mr-2 lg:ml-30 lg:mr-5' : 'flex-row mr-5 ml-2 lg:mr-30 lg:ml-5'"
-    >
-        <div class="shrink-0">
-            <img v-if="avatar" :src="avatarIcon" class="rounded-full w-[28px] sm:w-[40px] lg:w-[60px]" />
-            <Icon v-else :icon="avatarIcon" class="text-[28px] sm:text-[40px] lg:text-[60px]" />
-        </div>
-        <div class="text-xs sm:text-sm lg:text-lg">
-            {{content}}
-        </div>
-    </div>
+    <HumanMessageDisplay v-if="role=='human'" :message="(message as HumanMessage)" :avatar="avatar"/>
+    <AgentMessageDisplay v-else-if="role=='agent'" :message="(message as AIMessage)" :avatar="avatar"/>
+    <ToolMessageDisplay v-else-if="role=='tool'" :message="(message as ToolMessage)" :avatar="avatar"/>
 </template>

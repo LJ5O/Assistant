@@ -6,7 +6,7 @@
     import Input from '../Form/Input.vue'
     import Message from './ChatComponent/Message.vue'
     import { sendMessage } from '../../API/Messages'
-    import { HumanMessage, AIMessage, ToolMessage, UserAnswer } from '../../API/Types/Types'
+    import type { HumanMessage, AIMessage, ToolMessage, UserAnswer } from '../../API/Types/Types'
 
     const userMessage = ref<string>('')
     const messagesList = ref<(HumanMessage|AIMessage|ToolMessage)[]>([])
@@ -14,7 +14,7 @@
 
     const sendUserMessageToBack = async ()=>{
         inputDisabled.value = true;
-        const answer:UserAnswer = await sendMessage(userMessage.value)
+        const answer:UserAnswer = await sendMessage(userMessage.value) //TODO try catch
         answer.fields.steps.forEach(message => {
             messagesList.value.push(message)
         });
@@ -28,11 +28,7 @@
     <div class="w-full h-95/100 border-1 border-neutral-200 flex flex-col flex-nowrap justify-between">
         <div class="w-full flex-1 bg-neutral-900 overflow-y-scroll">
 
-            <Message content="Hello World !" role="user"/>
-            <Message content="World, Hello !" role="chatbot"/>
-            <Message content="World, Hello !" role="chatbot" avatar="https://picsum.photos/100"/>
-            <Message content="Hi ! How are you ?" role="user" avatar="https://picsum.photos/101"/>
-            <Message v-for="(message, index) in messagesList" :content="message.content" role="user" />
+            <Message v-for="(message, index) in messagesList" :message="message" />
 
         </div>
         <div class="w-full min-h-18 h-20 bg-neutral-900 border-t-neutral-200 border-t-1 flex flex-row justify-between whitespace-pre-wrap break-words">

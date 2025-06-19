@@ -5,14 +5,13 @@
  * Finding a better way to import this is also a TODO
  */
 
-import {
+import type {
     UserAnswer,
     UserRequest,
     HumanMessage,
     ToolCall,
     AIMessage,
     ToolMessage,
-    UserAnswer,
     History,
     HistoryRequest
 } from '../../../../../modules/BackEnd/src/Types/BrainHandle'
@@ -24,7 +23,6 @@ export type {
     ToolCall,
     AIMessage,
     ToolMessage,
-    UserAnswer,
     History,
     HistoryRequest
 }
