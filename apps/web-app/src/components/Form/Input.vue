@@ -5,13 +5,15 @@ const model = defineModel<string>({required: true})
 export interface Props{
     type?: string,
     long?: boolean,
-    placeholder?: string
+    placeholder?: string,
+    disabled?:boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     type: 'text',
     long: false,
-    placeholder: ''
+    placeholder: '',
+    disabled:false
 })
 </script>
 
@@ -30,6 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
     disabled:cursor-not-allowed placeholder:text-neutral-500
   "
   :placeholder="placeholder"
+  :disabled="disabled"
 />
 <input
   v-else
