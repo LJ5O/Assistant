@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
-import { getStoredToken } from './utils'
+import { getStoredToken } from './Utils'
+import type { UserAnswer } from './Types/Types'
 
-export async function sendMessage(message:string):any{//TODO : return type
+export async function sendMessage(message:string):UserAnswer{
     /**
      * Function that tries to send a message written by User to the back-end and Python brain subprocess
      * Needs token to be stored / user to be logged-in
@@ -12,7 +13,8 @@ export async function sendMessage(message:string):any{//TODO : return type
     const token = getStoredToken()
     if(!token){
         console.error("Please, login again before using the app !")
-        useRouter().push('/');
+        const router = useRouter()
+        router.push('/');
         return null
     }
 
@@ -25,7 +27,9 @@ export async function sendMessage(message:string):any{//TODO : return type
                 timeout: 10000,//10s
                 headers: {authorization: token}// Auth header is mandatory
             })
-        if(answer.data.type!=="UserAnswer") throw new Error("Type of object we received is not the one we are waiting for !");
+            
+        const data:UserAnswer = answer.data
+        if(data.type!=="UserAnswer") throw new Error("Type of object we received is not the one we are waiting for !");
         return answer.data
     }catch(err){
         console.error(err)

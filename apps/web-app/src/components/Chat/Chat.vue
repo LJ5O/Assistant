@@ -6,18 +6,20 @@
     import Input from '../Form/Input.vue'
     import Message from './ChatComponent/Message.vue'
     import { sendMessage } from '../../API/Messages'
+    import { HumanMessage, AIMessage, ToolMessage, UserAnswer } from '../../API/Types/Types'
 
     const userMessage = ref<string>('')
-    const messagesList = ref<any[]>([])//TODO : type
+    const messagesList = ref<(HumanMessage|AIMessage|ToolMessage)[]>([])
     const inputDisabled = ref<boolean>(false)
 
     const sendUserMessageToBack = async ()=>{
         inputDisabled.value = true;
-        const messages:any[] = await sendMessage(userMessage.value) // TODO types
-        messages.fields.steps.forEach(message => {
+        const answer:UserAnswer = await sendMessage(userMessage.value)
+        answer.fields.steps.forEach(message => {
             messagesList.value.push(message)
         });
         inputDisabled.value = false;
+        userMessage.value = '';
     }
 
 </script>

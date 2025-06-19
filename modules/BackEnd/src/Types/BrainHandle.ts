@@ -1,5 +1,5 @@
 // User request to Brain
-export interface UserRequest {
+interface UserRequest {
   type: "UserRequest";
   thread_id: string;
   fields: {
@@ -7,27 +7,31 @@ export interface UserRequest {
     linked: string[];
   };
 }
+export type { UserRequest };
 
 // Query sent to Brain
-export interface QueryModules {
+interface QueryModules {
   type: "query:modules";
   fields: Record<string, never>;
 }
+export type { QueryModules };
 
-export interface HumanMessage {
+interface HumanMessage {
   type: 'HumanMessage';
   content: string;
   id: string;
 }
+export type { HumanMessage };
 
-export interface ToolCall {
+interface ToolCall {
   type: 'ToolCall'
   name: string;
   args: string[];
   id: string;
 }
+export type { ToolCall };
 
-export interface AIMessage {
+interface AIMessage {
   type: 'AIMessage';
   content: string;
   id: string;
@@ -38,17 +42,19 @@ export interface AIMessage {
     total_tokens: number;
   }
 }
+export type { AIMessage };
 
-export interface ToolMessage {
+interface ToolMessage {
   type: 'ToolMessage';
   name: string;
   content: string;
   id: string;
   tool_call_id: string;
 }
+export type { ToolMessage };
 
 // Answer from Brain
-export interface UserAnswer {
+interface UserAnswer {
   type: "UserAnswer";
   thread_id: string;
   fields: {
@@ -57,14 +63,17 @@ export interface UserAnswer {
     steps: (HumanMessage|AIMessage|ToolMessage)[];
   };
 }
+export type { UserAnswer };
 
-export interface History {
+interface History {
   type: "History",
   thread_id: string,
   messages: (HumanMessage|AIMessage|ToolMessage)[]
 }
+export type { History };
 
-export interface HistoryRequest {
+interface HistoryRequest {
   type: "HistoryRequest",
   thread_id: string
 }
+export type { HistoryRequest };
