@@ -1,39 +1,23 @@
 # web-app
 
-This template should help get you started developing with Vue 3 in Vite.
+This folder contains a *VueJs* website (**front-end**), that can be used to communicate with the **back-end**.
 
-## Recommended IDE Setup
+**As this project is still in early stages of development, web-app expects the API to be hosted at 127.0.0.1:3000 !** Parameters to change this are coming soon !
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Installation
 
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+Start by installing dependencies with
+```
+npm i --include=dev
 ```
 
-### Compile and Hot-Reload for Development
-
-```sh
+Then, launch the project with
+```
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
+You can also run some tests, for checking types, or running *Cypress* for e2e tests.
 ```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
+npm run type-check
+npm run test:e2e
 ```
