@@ -28,6 +28,11 @@ describe('Python subprocess can be used', () => {
         expect(brain.getSubprocess()).not.toBeNull()
     });
 
+    test('Waiting without any message available rejects', () => {
+        const error = new Error("Timeout for answer awaiting")
+        expect(brain.getAnswerFromBrain(1)).rejects.toEqual(error)
+    });
+
     test('We can send a request to the subprocess', async () => {
         const input:UserRequest = {
             type: "UserRequest",
@@ -67,9 +72,4 @@ describe('Python subprocess can be used', () => {
 
         expect(userMessages).toContain("Hello History !")
     }, 10000);
-
-    test('Waiting without any message available rejects', () => {
-        const error = new Error("Timeout for answer awaiting")
-        expect(brain.getAnswerFromBrain(500)).rejects.toEqual(error)
-    });
 });
