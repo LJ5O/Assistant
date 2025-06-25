@@ -2,6 +2,9 @@ import json
 
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
+from LLM.tools.ToolConfig import ToolConfig
+from LLM.tools.Tools import Tools
+
 
 class JsonConvertible():
     """
@@ -64,7 +67,7 @@ class UserRequest(JsonConvertible):
 
 class ToolCall(JsonConvertible):
 
-    def __init__(self, name:str, args:list[str], id:str):
+    def __init__(self, name:str, args:list[str], id:str, hidden=False):
         """
         Prepare a tool call to be sent by JSON
 
@@ -72,15 +75,20 @@ class ToolCall(JsonConvertible):
             name (str): Name of the called tool
             args (list[str]): Arguments passed
             id (str): ID of this tool
+            hidden (bool, optional): Should this call be hidden ? Defaults to False.
         """
         self.name = name
         self.args = args
         self.id = id
+        self.hidden = hidden
 
         self.dict = {
             "type": "ToolCall",
             "name": self.name,
             "args": self.args,
+            "display": {
+                "hidden": self.hidden
+            },
             "id": self.id
         }
 
@@ -128,9 +136,11 @@ class AIMessageJson(JsonConvertible):
         tools = []
         for tool in message.tool_calls:
             args = []
+            config: ToolConfig = Tools.getConfig(tool['name']) # So we can check how this tool is supposed to be displayed
+
             for key in tool['args'].keys():
                 args.append(f"{key}:{tool['args'][key]}")
-            tools.append(ToolCall(tool['name'], args, tool['id']))
+            tools.append(ToolCall(tool['name'], args, tool['id'], hidden=config.chatHidden))
             
         return AIMessageJson(message.content, message.id, tools,
             message.usage_metadata['input_tokens'] if message.usage_metadata else None,
@@ -140,7 +150,7 @@ class AIMessageJson(JsonConvertible):
 
 class ToolMessageJson(JsonConvertible):
 
-    def __init__(self, name:str, content:str, id:str, tool_call_id:str=""):
+    def __init__(self, name:str, content:str, id:str, tool_call_id:str="", hidden=False):
         """
         Defines a new ToolMessage ready to be sent to the node backend
 
@@ -149,18 +159,23 @@ class ToolMessageJson(JsonConvertible):
             content (str): Answer we got from the tool
             id (str): ID of this message
             tool_call_id (str, optional): ID of the message where this tool was called. Defaults to "".
+            hidden (bool, optional): Should this message be hidden ? Defaults to False
         """
         self.name = name
         self.content = content
         self.id = id
         self.toolCallID = tool_call_id
+        self.hidden = hidden
 
         self.dict = {
             "type": "ToolMessage",
             "name": self.name,
             "content": self.content,
             "id": self.id,
-            "tool_call_id": self.toolCallID
+            "tool_call_id": self.toolCallID,
+            "display": {
+                "hidden": self.hidden
+            }
         }
     
     @staticmethod
@@ -174,7 +189,8 @@ class ToolMessageJson(JsonConvertible):
         Returns:
             ToolMessageJson: Object json friendly
         """
-        return ToolMessageJson(message.name, message.content, message.id, message.tool_call_id)
+        config: ToolConfig = Tools.getConfig(message.name)
+        return ToolMessageJson(message.name, message.content, message.id, message.tool_call_id, hidden=config.chatHidden)
 
 class HumanMessageJson(JsonConvertible):
 

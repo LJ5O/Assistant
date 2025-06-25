@@ -70,6 +70,12 @@ class Brain():
                 request = UserRequest(command, thread_id)
                 answer = self.__LLM.getRunner().handleUserRequest(request) # Processing
                 print(answer.toJSON()) # Answer object -> JSON
+
+                from LLM.tools.ToolConfig import ToolConfig
+                from LLM.tools.Tools import Tools
+                print('tool name :'+answer.steps[2]['name'])
+                print(Tools.getConfigs()[answer.steps[2]['name']])
+
                 sys.stdout.flush()
 
 # -------------------

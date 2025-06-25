@@ -28,6 +28,9 @@ interface ToolCall {
   name: string;
   args: string[];
   id: string;
+  display: {
+    hidden: boolean;
+  }
 }
 export type { ToolCall };
 
@@ -50,6 +53,9 @@ interface ToolMessage {
   content: string;
   id: string;
   tool_call_id: string;
+  display: {
+    hidden: boolean;
+  }
 }
 export type { ToolMessage };
 
