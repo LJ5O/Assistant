@@ -15,7 +15,8 @@ const avatarIcon = props.avatar || 'solar:widget-5-line-duotone'
 </script>
 
 <template>
-    <div 
+    <div
+        v-if="!message.display.hidden"
         class="agent-message flex gap-5 mb-4 mt-2 flex-row mr-5 ml-2 lg:mr-30 lg:ml-5"
     >
         <div class="shrink-0">

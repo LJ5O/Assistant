@@ -12,11 +12,15 @@ interface Props{
 const props = defineProps<Props>()
 const avatarIcon = props.avatar || 'solar:face-scan-square-line-duotone'
 
-const toolCalls:ToolCall[] = props.message.tool_calls
+const toolCalls:ToolCall[] = []
+props.message.tool_calls.forEach(element => {
+    if(!element.display.hidden) toolCalls.push(element as ToolCall) // Only displayed calls are actually kept
+});
 </script>
 
 <template>
     <div 
+        v-if="toolCalls.length>0 || message.content.trim().length > 0 /* If nothing to display, let's just stop here */"
         class="agent-message flex gap-5 mb-4 mt-2 flex-row mr-5 ml-2 lg:mr-30 lg:ml-5"
     >
         <div class="shrink-0">

@@ -17,12 +17,13 @@ const answer = {
         "tool_calls": [
           {
             "type": "ToolCall",
-            "name": "multiply",
+            "name": "Multiply",
             "args": [
               "a:2",
               "b:2"
             ],
-            "id": "f840a722-9da5-4bef-b028-919f63faa81c"
+            "id": "f840a722-9da5-4bef-b028-919f63faa81c",
+            "display": {"hidden":false}
           }
         ],
         "usage_metadata": {
@@ -33,10 +34,11 @@ const answer = {
       },
       {
         "type": "ToolMessage",
-        "name": "multiply",
+        "name": "Multiply",
         "content": "4",
         "id": "37be1a9c-0b9b-4d9d-aa48-9922bf0c1cee",
-        "tool_call_id": "f840a722-9da5-4bef-b028-919f63faa81c"
+        "tool_call_id": "f840a722-9da5-4bef-b028-919f63faa81c",
+        "display": {"hidden":false}
       },
       {
         "type": "AIMessage",
@@ -62,6 +64,62 @@ const history = {
       "content": "Test OK",
       "id": "17edf288-d3a5-4a3b-b84a-51282b1bdf9b"
     }
+  ]
+}
+
+const history2 = {
+  "type": "History",
+  "thread_id": "admin",
+  "messages": [
+    {
+        "type": "HumanMessage",
+        "content": "Hi, how are you ?",
+        "id": "ec251086-ade3-41cf-8a50-223b809e26b2"
+      },
+      {
+        "type": "AIMessage",
+        "content": "",
+        "id": "run--1772fd21-3c71-4467-98b7-15d3606d7745-0",
+        "tool_calls": [
+          {
+            "type": "ToolCall",
+            "name": "Nothing",
+            "args": [
+              "__arg1:Hi, how are you?"
+            ],
+            "display": {
+              "hidden": true
+            },
+            "id": "2b6a0caf-4471-4f5a-ab16-3a85cda6f337"
+          }
+        ],
+        "usage_metadata": {
+          "input_tokens": 232,
+          "output_tokens": 23,
+          "total_tokens": 255
+        }
+      },
+      {
+        "type": "ToolMessage",
+        "name": "Nothing",
+        "content": "null",
+        "id": "ef17e860-70b8-4829-aa25-b6753854a5ce",
+        "tool_call_id": "2b6a0caf-4471-4f5a-ab16-3a85cda6f337",
+        "display": {
+          "hidden": true
+        }
+      },
+      {
+        "type": "AIMessage",
+        "content": "I'm just a language model, so I don't have feelings or emotions like humans do. I'm functioning properly and ready to assist with any questions or tasks you may have!",
+        "id": "run--4a38cfd2-673e-4918-a60f-9dc5e1a76800-0",
+        "tool_calls": [],
+        "usage_metadata": {
+          "input_tokens": 96,
+          "output_tokens": 37,
+          "total_tokens": 133
+        }
+      }
   ]
 }
 
@@ -118,10 +176,24 @@ describe('Chat with Agent', () => {
       cy.get('#message-send').click()
 
       cy.get('.human-message > .text-xs > p').contains('What\'s 2*2 ?')
-      cy.get('.tool-call > .font-bold > .font-extrabold').contains('multiply')
+      cy.get('.tool-call > .font-bold > .font-extrabold').contains('Multiply')
       cy.get('.tool-call > :nth-child(5)').contains('Arg b = 2')
-      cy.get('.tool-answer > .font-bold').contains('Answer from Tool : multiply')
+      cy.get('.tool-answer > .font-bold').contains('Answer from Tool : Multiply')
       cy.get(':nth-child(4) > .text-xs > p').contains('4')
+    })
+
+    it('useless tool calls are not shown', () => {
+      cy.window().then((win) => {
+        win.sessionStorage.setItem("jwt", "aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc");
+      });
+
+      cy.intercept('GET', '/history', { // So this doesn't mess with our test
+        statusCode: 200,
+        body: history2
+      }).as('mockHist');
+      cy.visit('/talk')
+
+      cy.get('.overflow-y-scroll').should('not.include.text', 'Nothing') // Useless calls must not be displayed
     })
  
 })
