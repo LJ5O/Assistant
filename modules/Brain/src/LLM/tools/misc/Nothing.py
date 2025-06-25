@@ -1,31 +1,25 @@
 from langchain.tools import Tool
 
 from ..ToolConfig import ToolConfig
+from ..ToolAbstract import ToolAbstract
 
-def nothing(*args) -> None:
-    """
-    As models may crave for calling tools, even when nothing was asked, here is a tool that does nothing.
-    """
-    pass
+class NothingTool(ToolAbstract):
 
-def getTool(name:str="Nothing", description:str="When you don't have to call any tools to answer. Accepts any args, and returns null") -> Tool:
-    """
-    Get the actual tool
+    def __init__(self, name:str="Nothing", description:str="When you don't have to call any tools to answer. Accepts any args, and returns null", config:ToolConfig=None):
+        self._name = name
+        self._description = description
 
-    Returns:
-        Tool: Tool object that can be used by the model
-    """
-    return Tool.from_function(
-        func=nothing,
-        name=name,
-        description=description
-    )
+        self._tool = Tool.from_function(
+            func=self._nothing,
+            name=self._name,
+            description=self._description
+        )
 
-def getConfig() -> ToolConfig:
-    """
-    Get the configuration for this tool
+        self._config = config if config else ToolConfig()
 
-    Returns:
-        ToolConfig: Project config about this tool
-    """
-    return ToolConfig(chatHidden=True, listHidden=True)
+
+    def _nothing(*args) -> None:
+        """
+        As models may crave for calling tools, even when nothing was asked, here is a tool that does nothing.
+        """
+        pass

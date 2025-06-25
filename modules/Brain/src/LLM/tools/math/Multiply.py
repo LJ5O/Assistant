@@ -1,45 +1,41 @@
 from langchain.tools import StructuredTool
 from pydantic import BaseModel, Field
 
+from ..ToolAbstract import ToolAbstract
 from ..ToolConfig import ToolConfig
 
 class CalculatorInput(BaseModel):
     a: int = Field(description="first number")
     b: int = Field(description="second number")
 
-def multiply(a: int, b:int) -> int:
-    """
-    Tool usable by an LLM to multiply two numbers.
-    Used as an example showing how to declare and add tools
+class MultiplyTool(ToolAbstract):
 
-    Args:
-        a (int): First number to multiply
-        b (int): Second number to multiply
+    def __init__(self, name:str="Multiply", description:str="Multiply two numbers", config:ToolConfig=None):
+        self._name = name
+        self._description = description
 
-    Returns:
-        int: Multiplication between a*b
-    """
-    return a*b
+        self._tool = StructuredTool.from_function(
+            func=self._multiply,
+            name=self._name,
+            description=self._description,
+            args_schema=CalculatorInput
+        )
 
-def getTool(name:str="Multiply", description:str="Multiply two numbers") -> StructuredTool:
-    """
-    Get the actual tool
+        self._config = config if config else ToolConfig()
 
-    Returns:
-        Tool: Tool object that can be used by the model
-    """
-    return StructuredTool.from_function(
-        func=multiply,
-        name=name,
-        description=description,
-        args_schema=CalculatorInput
-    )
+    def _multiply(self, a: int, b:int) -> int:
+        """
+        Tool usable by an LLM to multiply two numbers.
+        Used as an example showing how to declare and add tools
 
-def getConfig() -> ToolConfig:
-    """
-    Get the configuration for this tool
+        Args:
+            a (int): First number to multiply
+            b (int): Second number to multiply
 
-    Returns:
-        ToolConfig: Project config about this tool
-    """
-    return ToolConfig()
+        Returns:
+            int: Multiplication between a*b
+        """
+        return a*b
+
+
+
