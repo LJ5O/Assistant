@@ -8,3 +8,4 @@ Stored modules are :
 
 - **BackEnd** : This Typescript NodeJS server exposes an **HTTP API** that can be used by any **front-end** (*see `/app`*). Alongside this API, the **Brain subprocess** is also started. **BackEnd** is essentially a layer between the **HTTP API**, and the **Brain**.
 - **Brain** : A Python server launched as a subprocess, used to interact with **AI models**. It receives **JSON inputs** by *stdin*, and returns **JSON outputs** by *stdout*. This program is also in charge of executing **Tools** called by AIs, and others tasks.
+- **DockerDatabase** : An example of a *Docker compose* database preparation, mainly used for **development purposes**.
