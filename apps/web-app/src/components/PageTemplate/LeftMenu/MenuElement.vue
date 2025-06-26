@@ -22,7 +22,7 @@
     :class="currentTab ? 'bg-neutral-700' : ''">
         <div v-if="notif" class="absolute w-2 h-2 rounded-full bg-red-500 top-1 left-1"></div>
         <Icon :icon="icon" class="text-3xl"/>
-        <p class="text-2xl hidden [@container(min-width:120px)]:block">{{text}}</p>
+        <p class="text-xl hidden [@container(min-width:120px)]:block">{{text}}</p>
     </div>
 </template>
 
