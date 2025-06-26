@@ -1,30 +1,28 @@
 from .GraphBuilder import GraphBuilder
+from ..memory.Postgres import Postgres
+
 from langgraph.checkpoint.memory import MemorySaver
 
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, ToolMessage
 
 class CompiledGraph():
-    def __init__(self, graphBuiler:GraphBuilder):
-        """
-        Compile a GraphBuilder object. This object can also be used to run convenient methods on it.
+    def __init__(self, graphBuiler:GraphBuilder, memory:Postgres=None):
+        """Compile a GraphBuilder object. This object can also be used to run convenient methods on it.
 
         Args:
             graphBuiler (GraphBuilder): A Graph builder, ready to be built.
+            memory (Postgres, optional): Memory to store checkpoints. Defaults to None, stored in RAM.
         """
 
-        ### TEST
-        # https://medium.com/@sajith_k/using-postgresql-with-langgraph-for-state-management-and-vector-storage-df4ca9d9b89e
-
-        from psycopg import Connection
-        from langgraph.checkpoint.postgres import PostgresSaver
-        conn = Connection.connect("postgresql://postgres:NeverUseMeInProd@127.0.0.1:5432", autocommit=True) # TODO, close it when done
-        checkpointer = PostgresSaver(conn)
-        checkpointer.setup()
-
-        ### TEST END
+        if memory:
+            # Storage defined !
+            if not memory.isReady(): raise Exception("Memory provider was not ready when tried to compile the Graph !")
+            self.__memory = memory.toCheckPointSaver()
+        else:
+            # In RAM memory
+            self.__memory = MemorySaver()
 
         self.__rawGraph = graphBuiler
-        self.__memory = checkpointer#MemorySaver()
         self.__compiledGraph = graphBuiler.compile(self.__memory)
 
     def getGraph(self):

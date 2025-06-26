@@ -6,18 +6,20 @@ from .tools.Tools import Tools
 from .graph.GraphBuilder import GraphBuilder
 from .graph.CompiledGraph import CompiledGraph
 from .runner.Runner import Runner
+from .memory.Postgres import Postgres
 
 class LLM():
         """
         Class in charge of preparing the brain/LLM. Requires 0llama to be available and running.
         """
 
-        def __init__(self, model:str="llama3.1:8b"):
+        def __init__(self, model:str="llama3.1:8b", memory:Postgres=None):
             """
             Creates a new LLM, a full AI application able to execute user inputs.
 
             Args:
                 model (str, optional): Main LLM model. Defaults to "llama3.1:8b".
+                memory (Postgres, optional): Where to store Agent memories. Defaults to None, in RAM.
             """
             self.__modelName = model
             
@@ -26,7 +28,7 @@ class LLM():
             else:
                 self.LLM = OllamaModel(self.__modelName, Tools.getAll())
 
-            self.__graph = CompiledGraph(GraphBuilder(self.LLM))
+            self.__graph = CompiledGraph(GraphBuilder(self.LLM), memory=memory)
             self.__runner = Runner(self.__graph)
 
         def getCompiledGraph(self) -> CompiledGraph:
