@@ -6,3 +6,5 @@ langchain-ollama
 langchain-tavily
 pydantic
 pytest
+psycopg[binary]
+langgraph-checkpoint-postgres

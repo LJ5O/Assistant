@@ -11,8 +11,20 @@ class CompiledGraph():
         Args:
             graphBuiler (GraphBuilder): A Graph builder, ready to be built.
         """
+
+        ### TEST
+        # https://medium.com/@sajith_k/using-postgresql-with-langgraph-for-state-management-and-vector-storage-df4ca9d9b89e
+
+        from psycopg import Connection
+        from langgraph.checkpoint.postgres import PostgresSaver
+        conn = Connection.connect("postgresql://postgres:NeverUseMeInProd@127.0.0.1:5432", autocommit=True) # TODO, close it when done
+        checkpointer = PostgresSaver(conn)
+        checkpointer.setup()
+
+        ### TEST END
+
         self.__rawGraph = graphBuiler
-        self.__memory = MemorySaver()
+        self.__memory = checkpointer#MemorySaver()
         self.__compiledGraph = graphBuiler.compile(self.__memory)
 
     def getGraph(self):
