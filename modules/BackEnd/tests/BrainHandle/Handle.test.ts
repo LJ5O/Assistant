@@ -24,16 +24,14 @@ describe('Python subprocess can be used', () => {
     });
 
     // ----- Tests on the subprocess -----
-    test('Subprocess is up and ready', () => {
-        expect(brain.getSubprocess()).not.toBeNull()
+    test('Subprocess is up and ready', async () => {
+        await expect(brain.getSubprocess()).not.toBeNull()
     });
 
-    /*test('Waiting without any message available rejects', () => {
-        // Github Action HATES this test
-        // BuT It WoRks On My CoMpUtEr ! Wtf
+    test('Waiting without any message available rejects', async () => {
         const error = new Error("Timeout for answer awaiting")
-        expect(brain.getAnswerFromBrain(1)).rejects.toEqual(error)
-    });*/
+        await expect(brain.getAnswerFromBrain(1)).rejects.toEqual(error)
+    });
 
     test('We can send a request to the subprocess', async () => {
         const input:UserRequest = {
