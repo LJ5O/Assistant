@@ -7,7 +7,7 @@ on:
     branches: [ '*' ]
 
 jobs:
-  backend-tests:
+  brain-ci:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -27,6 +27,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: 🧠 Install ollama
+        run: curl -fsSL https://ollama.com/install.sh | sh
+
+      - name: 🚅 Run ollama
+        run: |
+          ollama serve &
+          ollama pull qwen3:0.6b
 
       - name: 🧪 Run Pytest
         run: pytest
