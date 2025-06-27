@@ -1,5 +1,7 @@
 # Assistant
 
+<img src="docs/public/logo.svg" alt="Project Logo" width="150" height="150">
+
 ## What's this project about ?
 > Have you ever wondered about having an assistant always ready to help you whenever you need ?
 > Want a convenient way to get the weather, set up reminders, ask for some information, ... ?
