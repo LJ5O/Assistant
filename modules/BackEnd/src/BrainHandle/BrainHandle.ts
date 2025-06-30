@@ -10,7 +10,7 @@ export class BrainManager {
 
   constructor(private scriptPath: string) {}
 
-  start(model:string|undefined=undefined): void {
+  async start(model:string|undefined=undefined): Promise<void> {
     if (this.process) {
       console.log("Process already running");
       return;
@@ -36,17 +36,15 @@ export class BrainManager {
     });
 
     // Check for Brain start
-    this.getAnswerFromBrain(3000).then(message=>{
-      if(message.trim() == "ready"){
+    const message = await this.getAnswerFromBrain(3000);
+    if(message.trim() == "ready"){
         console.log("Python process started.");
         this.ready = true;
-      }
-      else{
-        console.error("ERROR : Brain seems to be not working...")
-        this.stop();
-        process.exit(1); // Error, we stop here
-      }
-    });
+    }else{
+      console.error("ERROR : Brain seems to be not working...")
+      this.stop();
+      process.exit(1); // Error, we stop here
+    }
     
   }
 

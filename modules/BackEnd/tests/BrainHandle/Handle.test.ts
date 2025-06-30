@@ -9,10 +9,7 @@ describe('Python subprocess can be used', () => {
     // ----- Preparation for tests -----
     beforeAll(async () => {
         brain = new BrainManager("../Brain/src/main.py");
-        brain.start("test");
-
-        // Wait, so the subprocess can start
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await brain.start("test");
     });
 
     // ----- Stopping the subprocess -----
