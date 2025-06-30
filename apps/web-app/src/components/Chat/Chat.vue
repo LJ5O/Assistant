@@ -5,6 +5,7 @@
 
     import Input from '../Form/Input.vue'
     import Message from './ChatComponent/Message.vue'
+    import Dialog from '../ui/Dialog.vue'
     import { sendMessage, getHistory } from '../../API/Messages'
     import type { HumanMessage, AIMessage, ToolMessage, UserAnswer, History } from '../../API/Types/Types'
 
@@ -12,15 +13,27 @@
     const messagesList = ref<(HumanMessage|AIMessage|ToolMessage)[]>([])
     const inputDisabled = ref<boolean>(false)
 
+    const dialogDisplay = ref<boolean>(false)
+    const dialogTitle = ref<string>('')
+    const dialogContent = ref<string>('')
+
     const sendUserMessageToBack = async ()=>{
         inputDisabled.value = true;
-        const answer:UserAnswer = await sendMessage(userMessage.value) //TODO try catch
-        messagesList.value = []
-        answer.fields.steps.forEach(message => {
-            messagesList.value.push(message)
-        });
-        inputDisabled.value = false;
-        userMessage.value = '';
+        try{
+            const answer:UserAnswer = await sendMessage(userMessage.value) //TODO try catch
+            messagesList.value = []
+            answer.fields.steps.forEach(message => {
+                messagesList.value.push(message)
+            });
+            userMessage.value = '';
+        }catch(err){
+            console.error(err)
+            dialogTitle.value = "We are unable to send this message !"
+            dialogContent.value = "Sorry, something went wrong. Please, try again !"
+            dialogDisplay.value = true
+        }finally{
+            inputDisabled.value = false;
+        }
     }
 
     const getPastMessages = ()=>{
@@ -32,7 +45,10 @@
             });
         })
         .catch(err=>{
-            console.error(err) // TODO : display error
+            console.error(err)
+            dialogTitle.value = "Messages history can't be retrieved !"
+            dialogContent.value = "Sorry, we could not load the previous messages from this conversation. Please, try again !"
+            dialogDisplay.value = true
         })
     }
     getPastMessages()
@@ -41,6 +57,7 @@
 
 <template>
     <div class="w-full h-95/100 border-1 border-neutral-200 flex flex-col flex-nowrap justify-between">
+        <Dialog v-model="dialogDisplay" :title="dialogTitle" :content="dialogContent" type="error" />
         <div class="w-full flex-1 bg-neutral-900 overflow-y-scroll">
 
             <Message v-for="(message, index) in messagesList" :message="message" />
