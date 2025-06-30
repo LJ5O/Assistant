@@ -195,5 +195,33 @@ describe('Chat with Agent', () => {
 
       cy.get('.overflow-y-scroll').should('not.include.text', 'Nothing') // Useless calls must not be displayed
     })
+
+    it('Shows error on Axios errors', () => {
+      cy.window().then((win) => {
+        win.sessionStorage.setItem("jwt", "aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc");
+      });
+
+      // History request error
+      cy.intercept('GET', '/history', (req)=>{
+        req.destroy()//network error, https://docs.cypress.io/api/commands/intercept
+      });
+      cy.visit('/talk')
+
+      cy.get('.dialog').should('be.visible')
+      cy.get('.dialog-cancel').click()
+      cy.get('.dialog').should('not.exist')
+
+      // Ask request error
+      cy.intercept('POST', '/ask', (req)=>{
+        req.destroy()
+      });
+
+      cy.get('#message-input').type('What\'s 2*2 ?')
+      cy.get('#message-send').click()
+      
+      cy.get('.dialog').should('be.visible')
+      cy.get('.dialog-cancel').click()
+      cy.get('.dialog').should('not.exist')
+    })
  
 })
