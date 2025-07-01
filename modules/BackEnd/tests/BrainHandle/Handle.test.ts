@@ -1,7 +1,7 @@
 import {afterAll, beforeAll, describe, expect, test} from '@jest/globals';
 
 import {BrainManager} from '../../src/BrainHandle/BrainHandle'
-import {UserRequest, UserAnswer, History, HistoryRequest} from '../../src/Types/BrainHandle'
+import {UserRequest, UserAnswer, History, HistoryRequest, ConversationsRequest, AvailableConversations} from '../../src/Types/BrainHandle'
 
 describe('Python subprocess can be used', () => {
     let brain: BrainManager;
@@ -69,4 +69,25 @@ describe('Python subprocess can be used', () => {
 
         expect(userMessages).toContain("Hello History !")
     }, 10000);
+
+    test('We can retrieve previous conversations', async () => {
+        const input:UserRequest = {
+            type: "UserRequest",
+            thread_id: "user123.convToRetrieve456",
+            fields: {
+                input: "Hello World!",
+                linked: []
+            }
+        }
+        const output:UserAnswer = await brain.ask(input)
+        expect(output.fields.output).toBe('OK')
+
+        const request:ConversationsRequest = {
+            type: "ConversationsRequest",
+            user_id: "user123"
+        }
+        const answer:AvailableConversations = await brain.askAvailableConversations(request)
+        expect(answer.user_id).toBe('user123')
+        expect(answer.threads).toEqual(["user123.convToRetrieve456"])
+    });
 });
