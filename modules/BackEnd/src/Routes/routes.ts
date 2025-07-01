@@ -6,6 +6,7 @@ import {SWAGGER_CONFIG} from './swaggerConfig'
 
 import { ask } from '../Logic/Chat/ask'
 import { history } from '../Logic/Chat/history'
+import { conversations } from '../Logic/Chat/conversations'
 import { BrainManager } from '../BrainHandle/BrainHandle';
 import { UserData, AuthenticatedRequest } from '../Types/API';
 
@@ -57,6 +58,12 @@ export function defineRoutes(app:Express, brain:BrainManager){
     app.get('/history', (req:AuthenticatedRequest, res:Response) => {
         authenticateToken(req, res, ()=>{
             history(req, res, brain)
+        });
+    });
+
+    app.get('/conversations', (req:AuthenticatedRequest, res:Response) => {
+        authenticateToken(req, res, ()=>{
+            conversations(req, res, brain)
         });
     });
 

@@ -135,18 +135,12 @@ export const SWAGGER_CONFIG: SwaggerOptions = {
         security: [{ Bearer: [] }],
         parameters: [
           {
-            name: 'body',
-            in: 'body',
+            name: 'conversation',
+            in: 'query',
             required: true,
             schema: {
-              type: 'object',
-              required: ['conversation'],
-              properties: {
-                conversation: {
-                  type: 'string',
-                  example: '74985',
-                },
-              },
+              type: 'string',
+              example: '7589464',
             },
           },
         ],
@@ -174,6 +168,50 @@ export const SWAGGER_CONFIG: SwaggerOptions = {
                         additionalProperties: true
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          422: {
+            description: 'Utilisateur non authentifié ou identifiant manquant',
+            schema: {
+              type: 'object',
+              properties: {
+                error: { type: 'string', example: 'Missing or invalid fields in body.' }
+              }
+            }
+          },
+          504: {
+            description: 'Pas de réponse (timeout)',
+            schema: {
+              type: 'object',
+              properties: {
+                error: { type: 'string', example: 'Timeout.' }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/conversations': {
+      get: {
+        summary: 'Get all availables conversations you started with the Agent',
+        description: 'Returns every available conversation you started with the AI',
+        security: [{ Bearer: [] }],
+        responses: {
+          200: {
+            description: 'Availables conversations',
+            schema: {
+              type: 'object',
+              properties: {
+                type: { type: 'string', example: 'AvailableConversations' },
+                user_id: { type: 'string', example: 'user1234' },
+                threads: {
+                  type: 'array',
+                  items: {
+                    type: 'string',
+                    example: 'user1234.conv13554'
                   }
                 }
               }

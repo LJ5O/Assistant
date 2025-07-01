@@ -1,6 +1,6 @@
 import { spawn, ChildProcessWithoutNullStreams } from "child_process";
 
-import {UserRequest, UserAnswer, HistoryRequest, History} from '../Types/BrainHandle'
+import {UserRequest, UserAnswer, HistoryRequest, History, ConversationsRequest, AvailableConversations} from '../Types/BrainHandle'
 
 export class BrainManager {
     
@@ -61,9 +61,14 @@ export class BrainManager {
     return JSON.parse(await this.getAnswerFromBrain(5000, input.thread_id))
   }
 
-  async askHistory(input: HistoryRequest): Promise<History> { // TODO : Merge the two ask methods
+  async askHistory(input: HistoryRequest): Promise<History> { // TODO : Merge the three ask methods
     this.send(JSON.stringify(input));
     return JSON.parse(await this.getAnswerFromBrain(5000, input.thread_id))
+  }
+
+  async askAvailableConversations(input: ConversationsRequest): Promise<AvailableConversations> {
+    this.send(JSON.stringify(input));
+    return JSON.parse(await this.getAnswerFromBrain(5000, input.user_id))
   }
 
   stop(): void {
@@ -99,7 +104,8 @@ export class BrainManager {
             this.messagesFile.map((v,i)=>{
               // We are looking for one message corresponding to the filter
               try{
-                if(JSON.parse(v).thread_id == threadIdFilter){
+                const obj:any = JSON.parse(v);
+                if(obj?.thread_id == threadIdFilter || obj?.user_id == threadIdFilter){
                   this.messagesFile.splice(i,1); // We found the message we were looking for !
                   found = true;
                   clearTimeout(timeoutId)
