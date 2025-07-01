@@ -293,12 +293,12 @@ class ConversationsRequest(JsonConvertible):
     def __init__(self, userId:str):
         self.userId = userId
         self.dict = {
-            "type": "ConversationRequest",
+            "type": "ConversationsRequest",
             "user_id": self.userId
         }
 
     @staticmethod
-    def fromJSON(json_str: str)-> 'ConversationRequest':
+    def fromJSON(json_str: str)-> 'ConversationsRequest':
         """
         Parse a JSON string to create a ConversationsRequest instance
 

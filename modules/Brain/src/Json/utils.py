@@ -1,4 +1,4 @@
-from .Types import UserRequest, HistoryRequest
+from .Types import UserRequest, HistoryRequest, ConversationsRequest
 
 import json
 
@@ -18,7 +18,7 @@ def processInput(input:str) -> UserRequest|HistoryRequest:
         input (str): JSON string we received
 
     Returns:
-        UserRequest|HistoryRequest: Object representing this JSON string
+        UserRequest|HistoryRequest|ConversationsRequest: Object representing this JSON string
     """
     try:
         data = json.loads(input.strip())
@@ -28,6 +28,8 @@ def processInput(input:str) -> UserRequest|HistoryRequest:
             return UserRequest.fromJSON(input)
         elif(type_=="HistoryRequest"):
             return HistoryRequest.fromJSON(input)
+        elif(type_=="ConversationsRequest"):
+            return ConversationsRequest.fromJSON(input)
         else:
             raise unknownJsonObject()
     except json.JSONDecodeError as e:

@@ -1,6 +1,8 @@
 from ..memory.Postgres import Postgres
 from ..graph.CompiledGraph import CompiledGraph
 
+from Json.Types import ConversationsRequest, AvailableConversations
+
 from langgraph.checkpoint.memory import MemorySaver
 
 class ContextualQueries():
@@ -20,7 +22,19 @@ class ContextualQueries():
         self.__graph:CompiledGraph = graph
         self.__memory:Postgres = memory
 
-    def getThreadsForUser(self, user:str)->list[str]:
+    def handleConversationsRequest(self, request:ConversationsRequest)->AvailableConversations:
+        """
+        From a ConversationsRequest, find every threads associated with a given user ID
+
+        Args:
+            request (ConversationsRequest): Request from Node Backend
+
+        Returns:
+            AvailableConversations: A JSON object with a list of every threads available
+        """
+        return AvailableConversations(request.userId, self.__getThreadsForUser(request.userId))
+
+    def __getThreadsForUser(self, user:str)->list[str]:
         if(self.__memory):
             # We have a memory we can use to get the threads
             return self.__memory.getThreadsForUser(user)

@@ -3,7 +3,7 @@ from LLM.LLM import LLM
 from LLM.memory.Postgres import Postgres
 
 from Json.utils import processInput
-from Json.Types import UserRequest, UserAnswer, HistoryRequest
+from Json.Types import UserRequest, UserAnswer, HistoryRequest, History, ConversationsRequest, AvailableConversations
 
 class Brain():
     """
@@ -69,7 +69,9 @@ class Brain():
                 if(type(request) is UserRequest):
                     answer:UserAnswer = self.__LLM.getRunner().handleUserRequest(request) # Processing
                 elif(type(request) is HistoryRequest):
-                    answer:UserAnswer = self.__LLM.getRunner().getHistory(request.threadId)
+                    answer:History = self.__LLM.getRunner().getHistory(request.threadId)
+                elif(type(request) is ConversationsRequest):
+                    answer:AvailableConversations = self.__LLM.query().handleConversationsRequest(request)
                 else:
                     raise NotImplementedError("Unknown command !")
                 
