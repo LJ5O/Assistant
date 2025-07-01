@@ -4,6 +4,7 @@ from ..memory.Postgres import Postgres
 from langgraph.checkpoint.memory import MemorySaver
 
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, ToolMessage
+from langgraph.checkpoint.postgres import PostgresSaver
 
 class CompiledGraph():
     def __init__(self, graphBuiler:GraphBuilder, memory:Postgres=None):
@@ -33,6 +34,15 @@ class CompiledGraph():
             CompiledGraph: A compiled graph from LangGraph
         """
         return self.__compiledGraph
+
+    def getMemory(self)->MemorySaver|PostgresSaver:
+        """
+        Returns the memory used by the compiled graph
+
+        Returns:
+            MemorySaver|PostgresSaver: Low level memory used by the graph
+        """
+        return self.__memory
 
     def stream_graph_updates(self, user_input: str):
         """

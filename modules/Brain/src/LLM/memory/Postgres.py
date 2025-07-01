@@ -67,3 +67,26 @@ class Postgres():
             self.__postgresSaver = PostgresSaver(self.getConnection())
             self.__postgresSaver.setup()
         return self.__postgresSaver
+
+    def getThreadsForUser(self, user:str)->list[str]:
+        """
+        Requests the database to find all conversations tied to a specific user ID
+
+        Args:
+            user (str): User id
+
+        Returns:
+            list[str]: A list of every threads we were able to find in the database
+        """
+        if not self.isReady():
+            raise Exception("Database not connected.")
+        
+        with self.__connection.cursor() as cur:
+            cur.execute("""
+                SELECT DISTINCT thread_id
+                FROM checkpoints
+                WHERE thread_id LIKE %s;
+            """, (f"{user}%",))
+
+            results = cur.fetchall()
+            return [row[0] for row in results]

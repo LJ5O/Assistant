@@ -6,6 +6,7 @@ from .tools.Tools import Tools
 from .graph.GraphBuilder import GraphBuilder
 from .graph.CompiledGraph import CompiledGraph
 from .runner.Runner import Runner
+from .runner.ContextualQueries import ContextualQueries
 from .memory.Postgres import Postgres
 
 class LLM():
@@ -30,6 +31,7 @@ class LLM():
 
             self.__graph = CompiledGraph(GraphBuilder(self.LLM), memory=memory)
             self.__runner = Runner(self.__graph)
+            self.__queries = ContextualQueries(self.__graph, memory=memory)
 
         def getCompiledGraph(self) -> CompiledGraph:
             """
@@ -50,6 +52,16 @@ class LLM():
                 Runner: A Runner object, with methods allowing easy interactions with the AI graph
             """
             return self.__runner
+
+        def query(self) -> ContextualQueries:
+            """
+            How many functions are available ? What are the available threads for that user ?
+            If you want to query the Brain on something not directly related to the Agent, that's the way !
+
+            Returns:
+                ContextualQueries: An objet with utility methods to know more about the Brain
+            """
+            return self.__queries
         
 if __name__ == "__main__":
     from Json.Types import UserRequest, UserAnswer, HumanMessageJson, AIMessageJson, ToolMessageJson
