@@ -83,3 +83,16 @@ interface HistoryRequest {
   thread_id: string
 }
 export type { HistoryRequest };
+
+interface ConversationsRequest {
+  type: "ConversationsRequest",
+  user_id: string
+}
+export type {ConversationsRequest};
+
+interface AvailableConversations {
+  type: "AvailableConversations",
+  user_id: string,
+  threads: string[]
+}
+export type {AvailableConversations};
