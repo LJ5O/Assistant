@@ -4,13 +4,14 @@ import {BrainManager} from '../../BrainHandle/BrainHandle'
 import { History, HistoryRequest } from '../../Types/BrainHandle';
 
 export function history(req:AuthenticatedRequest, res:Response, brain:BrainManager):void{
-    if(req.user?.login){
+    if(req.user?.login && req.body?.conversation){
 
         const userId = req.user.login as string
+        const conversation = req.body.conversation as string
 
         const request: HistoryRequest = {
             type: "HistoryRequest",
-            thread_id: userId
+            thread_id: userId+'.'+conversation
         }
 
         brain.askHistory(request)

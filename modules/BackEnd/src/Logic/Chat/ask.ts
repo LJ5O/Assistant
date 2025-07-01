@@ -4,14 +4,15 @@ import {BrainManager} from '../../BrainHandle/BrainHandle'
 import { UserRequest, UserAnswer } from '../../Types/BrainHandle';
 
 export function ask(req:AuthenticatedRequest, res:Response, brain:BrainManager):void{
-    if(req.body?.message && req.user?.login){
+    if(req.body?.message && req.body?.conversation && req.user?.login){
 
         const message = req.body.message as string // TODO : Avoid injections from clients that could cause trouble
         const userId = req.user.login as string
+        const conversation = req.body.conversation as string
 
         const request: UserRequest = {
             type: "UserRequest",
-            thread_id: userId,
+            thread_id: userId+'.'+conversation,
             fields: {
                 input: message,
                 linked: []

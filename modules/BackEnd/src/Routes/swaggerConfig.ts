@@ -88,8 +88,12 @@ export const SWAGGER_CONFIG: SwaggerOptions = {
             required: true,
             schema: {
               type: 'object',
-              required: ['message'],
+              required: ['conversation', 'message'],
               properties: {
+                conversation: {
+                  type: 'string',
+                  example: '74985',
+                },
                 message: {
                   type: 'string',
                   example: 'What\' 2*2 ?',
@@ -129,6 +133,23 @@ export const SWAGGER_CONFIG: SwaggerOptions = {
         summary: 'Récupère l’historique des échanges',
         description: 'Retourne l’historique des messages entre l’utilisateur et le cerveau IA.',
         security: [{ Bearer: [] }],
+        parameters: [
+          {
+            name: 'body',
+            in: 'body',
+            required: true,
+            schema: {
+              type: 'object',
+              required: ['conversation'],
+              properties: {
+                conversation: {
+                  type: 'string',
+                  example: '74985',
+                },
+              },
+            },
+          },
+        ],
         responses: {
           200: {
             description: 'Historique des messages',
