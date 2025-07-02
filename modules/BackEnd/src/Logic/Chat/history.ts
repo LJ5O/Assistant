@@ -21,11 +21,12 @@ export function history(req:AuthenticatedRequest, res:Response, brain:BrainManag
             return;
         }
 
-        brain.askHistory(request)
+        brain.ask(request)
         .then(answer => {
             res.status(200).json(answer as History)
         })
         .catch(_=>{
+            console.log()
             res.status(504).json({ error: 'Timeout.' })
         })
 

@@ -65,6 +65,14 @@ class Brain():
 
             if not self.__TEST:
                 # Classical behavior
+
+                # --- Temporary fix ---
+                import json #TODO : Better management of messages
+                command = json.loads(command)
+                uuid = command['UUID']
+                command = json.dumps(command['request'])
+                # --- Temporary fix ---
+
                 request = processInput(command) # JSON -> Object
                 if(type(request) is UserRequest):
                     answer:UserAnswer = self.__LLM.getRunner().handleUserRequest(request) # Processing
@@ -74,8 +82,8 @@ class Brain():
                     answer:AvailableConversations = self.__LLM.query().handleConversationsRequest(request)
                 else:
                     raise NotImplementedError("Unknown command !")
-                
-                print(answer.toJSON()) # Answer object -> JSON
+
+                print("{\"UUID\":\""+uuid+"\", \"answer\":"+answer.toJSON()+"}") # Answer object -> JSON # --- Temporary fix ---
                 sys.stdout.flush()
             
             else:

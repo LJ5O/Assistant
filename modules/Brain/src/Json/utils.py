@@ -10,7 +10,7 @@ class InvalidInputException(Exception):
     def __init__(self, message="The string we received was not formatted in JSON !"):
         super().__init__(message)
 
-def processInput(input:str) -> UserRequest|HistoryRequest:
+def processInput(input:str) -> UserRequest|HistoryRequest|ConversationsRequest:
     """
     Gets the input sent by Nodejs backend, and process it to get an object we can work on
 

@@ -1,6 +1,19 @@
 import { spawn, ChildProcessWithoutNullStreams } from "child_process";
+import crypto from "crypto"
 
 import {UserRequest, UserAnswer, HistoryRequest, History, ConversationsRequest, AvailableConversations} from '../Types/BrainHandle'
+
+type Requests = UserRequest|HistoryRequest|ConversationsRequest // Types used to ask something to the brain
+type Answers = UserAnswer|History|AvailableConversations // Types used to receive an asnwer from the brain
+
+interface BrainRequest{
+  UUID:string,
+  request: Requests
+}
+interface BrainAnswer{
+  UUID:string,
+  answer: Answers
+}
 
 export class BrainManager {
     
@@ -36,7 +49,7 @@ export class BrainManager {
     });
 
     // Check for Brain start
-    const message = await this.getAnswerFromBrain(3000);
+    const message = await this.getAnswerFromBrain(3000, '') as string;
     if(message.trim() == "ready"){
         console.log("Python process started.");
         this.ready = true;
@@ -48,7 +61,7 @@ export class BrainManager {
     
   }
 
-  send(input: string): void {
+  private sendRaw(input:string):void{
     if (!this.process) {
       console.error("Process not started");
       return;
@@ -56,63 +69,82 @@ export class BrainManager {
     this.process.stdin.write(input + "\n");
   }
 
-  async ask(input: UserRequest): Promise<UserAnswer> {
-    this.send(JSON.stringify(input));
-    return JSON.parse(await this.getAnswerFromBrain(5000, input.thread_id))
+  send(input: BrainRequest): void {
+    if (!this.process) {
+      console.error("Process not started");
+      return;
+    }
+    this.process.stdin.write(JSON.stringify(input) + "\n");
   }
 
-  async askHistory(input: HistoryRequest): Promise<History> { // TODO : Merge the three ask methods
-    this.send(JSON.stringify(input));
-    return JSON.parse(await this.getAnswerFromBrain(5000, input.thread_id))
-  }
+  async ask(input: Requests): Promise<Answers> {
+    /**
+     * Ask something to the brain, and wait for the answer
+     * Will always return the corresponding Answer object ( UserRequest -> UserAnswer; HistoryRequest->History, ... )
+     */
+    const uuid:string = crypto.randomUUID();
+    this.send({
+      UUID: uuid,
+      request: input
+    } as BrainRequest);
 
-  async askAvailableConversations(input: ConversationsRequest): Promise<AvailableConversations> {
-    this.send(JSON.stringify(input));
-    return JSON.parse(await this.getAnswerFromBrain(5000, input.user_id))
+    const answer = await this.getAnswerFromBrain(50000, uuid) as BrainAnswer
+    return answer.answer
   }
 
   stop(): void {
     if (this.process) {
-      this.send("exit")
+      this.sendRaw("exit")
       this.process = null;
       this.ready = false;
     }
   }
 
-  getAnswerFromBrain(timeoutMs:number = 5000, threadIdFilter:string|undefined = undefined): Promise<string>{
+  getAnswerFromBrain(timeoutMs:number = 5000, uuid:string): Promise<BrainAnswer|string>{
     /**
      * Awaits for a message to be available in the Brain messages arrivals waiting room.
-     * It will be returned as a String
+     * It will be returned as a BrainAnswer if can be JSON parsed, string otherwise 
      */
-    return new Promise<string>((resolve, reject)=>{
+    return new Promise<BrainAnswer|string>((resolve, reject)=>{
 
       let stop = false; // Timeout stop, stops the recursive check
       let found = false; // Found : stops the timeout rejection
       let timeoutId: NodeJS.Timeout // So we can clear this timeout when finished
       const check = ()=>{
         if(stop)return; // Timeout reached
-
+        console.log("lookin")
         try{
-          if(this.messagesFile.length>0 && !threadIdFilter){ // A message arrived !
-            const msg:string = this.messagesFile[0] // Just take the first one
-            this.messagesFile.splice(0,1); // Remove the message we just took
-            found = true;
-            clearTimeout(timeoutId)
-            resolve((''+msg).trim()); // msg may be a Buffer, ''+ is used to convert it to String
-          }else if(this.messagesFile.length>0 && threadIdFilter){
+          if(this.messagesFile.length>0){ // If some messages are waiting // TODO : avoid messages indefinitely here
 
-            this.messagesFile.map((v,i)=>{
-              // We are looking for one message corresponding to the filter
+            for(let i=0; i<this.messagesFile.length; i++){ // For each message
+              const v = this.messagesFile[i]
               try{
-                const obj:any = JSON.parse(v);
-                if(obj?.thread_id == threadIdFilter || obj?.user_id == threadIdFilter){
+                const obj:BrainAnswer = JSON.parse(v); // Try to load this message
+
+                console.log(obj.UUID +' '+ uuid)
+                console.log(obj.UUID === uuid)
+    
+                if(obj.UUID === uuid){ // If that's the one we're looking for
                   this.messagesFile.splice(i,1); // We found the message we were looking for !
-                  found = true;
+                  found = true;stop = true;
                   clearTimeout(timeoutId)
-                  resolve((''+v).trim());
+                  resolve(obj);
+                  return
                 }
-              }catch{}
-            })
+              }catch(e){
+                // Not a JSON object, certainly the "ready" from server startup
+                if((v+'').trim() === "ready"){
+                  found = true;stop = true;
+                  clearTimeout(timeoutId)
+                  this.messagesFile.splice(i,1)
+                  resolve(v+''); // v may be a Buffer
+                }else{
+                  console.log(e)
+                  // TODO error on invalid JSON
+                  
+                }
+              }
+            }
 
           }else{
             setTimeout(check, 100);
