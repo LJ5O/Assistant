@@ -26,8 +26,8 @@ describe('Python subprocess can be used', () => {
     });
 
     test('Waiting without any message available rejects', async () => {
-        const error = new Error("Timeout for answer awaiting")
-        await expect(brain.getAnswerFromBrain(1)).rejects.toEqual(error)
+        const error = new Error("Timeout waiting for message with UUID: uuid")
+        await expect(brain.getAnswerFromBrain("uuid", 100)).rejects.toEqual(error)
     });
 
     test('We can send a request to the subprocess', async () => {
@@ -39,7 +39,7 @@ describe('Python subprocess can be used', () => {
                 linked: []
             }
         }
-        const output:UserAnswer = await brain.ask(input)
+        const output:UserAnswer = await brain.ask(input) as UserAnswer
         expect(output.fields.output).toBe('OK')
     });
 
@@ -58,7 +58,7 @@ describe('Python subprocess can be used', () => {
             type: "HistoryRequest",
             thread_id: "default"
         }
-        const hist:History = await brain.askHistory(historyRequest) // And now, we try to get it from the history request
+        const hist:History = await brain.ask(historyRequest) as History // And now, we try to get it from the history request
         let userMessages:string[] = []
 
         for(let i=0; i<hist.messages.length; i++){
@@ -79,14 +79,14 @@ describe('Python subprocess can be used', () => {
                 linked: []
             }
         }
-        const output:UserAnswer = await brain.ask(input)
+        const output:UserAnswer = await brain.ask(input) as UserAnswer
         expect(output.fields.output).toBe('OK')
 
         const request:ConversationsRequest = {
             type: "ConversationsRequest",
             user_id: "user123"
         }
-        const answer:AvailableConversations = await brain.askAvailableConversations(request)
+        const answer:AvailableConversations = await brain.ask(request) as AvailableConversations
         expect(answer.user_id).toBe('user123')
         expect(answer.threads).toEqual(["user123.convToRetrieve456"])
     });
