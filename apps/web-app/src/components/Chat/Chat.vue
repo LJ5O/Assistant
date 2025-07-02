@@ -1,6 +1,6 @@
 <script setup lang="ts">
     
-    import {ref} from 'vue';
+    import {ref, watch} from 'vue';
     import { Icon } from "@iconify/vue";
     import { useRoute } from 'vue-router'
     const route = useRoute()
@@ -18,6 +18,11 @@
     const dialogDisplay = ref<boolean>(false)
     const dialogTitle = ref<string>('')
     const dialogContent = ref<string>('')
+
+    watch(() => route.params.id, (newId) => {
+        console.log("Opened new conv, "+newId)
+        getPastMessages()
+    })
 
     const sendUserMessageToBack = async ()=>{
         inputDisabled.value = true;

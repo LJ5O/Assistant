@@ -13,7 +13,9 @@ import type {
     AIMessage,
     ToolMessage,
     History,
-    HistoryRequest
+    HistoryRequest,
+    ConversationsRequest,
+    AvailableConversations
 } from '../../../../../modules/BackEnd/src/Types/BrainHandle'
 
 export type {
@@ -24,5 +26,7 @@ export type {
     AIMessage,
     ToolMessage,
     History,
-    HistoryRequest
+    HistoryRequest,
+    ConversationsRequest,
+    AvailableConversations
 }
