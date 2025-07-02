@@ -45,17 +45,17 @@ class UserRequest(JsonConvertible):
         self.dict = {"type":self.type, "thread_id":self.threadId, "fields":{"input":self.input, "linked":self.linked}}
 
     @staticmethod
-    def fromJSON(json_str: str) -> 'UserRequest':
+    def fromJSON(json_str: str|dict) -> 'UserRequest':
         """
         Parse a JSON string to create a UserRequest instance
 
         Args:
-            json_str (str): JSON string to parse
+            json_str (str|dict): JSON string to parse, or JSON shaped dict
 
         Returns:
             UserRequest: instance created from JSON data
         """
-        data = json.loads(json_str)
+        data = json.loads(json_str) if type(json_str) is str else json_str
         
         type_ = data.get("type", "userRequest")
         thread_ = data.get("thread_id", "default")
@@ -274,17 +274,17 @@ class HistoryRequest(JsonConvertible):
         }
 
     @staticmethod
-    def fromJSON(json_str: str) -> 'HistoryRequest':
+    def fromJSON(json_str: str|dict) -> 'HistoryRequest':
         """
         Parse a JSON string to create a HistoryRequest instance
 
         Args:
-            json_str (str): JSON string to parse
+            json_str (str|dict): JSON string to parse, or JSON shaped dict
 
         Returns:
             UserRequest: instance created from JSON data
         """
-        data = json.loads(json_str)
+        data = json.loads(json_str) if type(json_str) is str else json_str
         
         thread_ = data['thread_id']
         return HistoryRequest(thread_)
@@ -298,17 +298,17 @@ class ConversationsRequest(JsonConvertible):
         }
 
     @staticmethod
-    def fromJSON(json_str: str)-> 'ConversationsRequest':
+    def fromJSON(json_str: str|dict)-> 'ConversationsRequest':
         """
         Parse a JSON string to create a ConversationsRequest instance
 
         Args:
-            json_str (str): JSON string to parse
+            json_str (str|dict): JSON string to parse, or JSON shaped dict
 
         Returns:
             ConversationsRequest: instance created from JSON data
         """
-        data = json.loads(json_str)
+        data = json.loads(json_str) if type(json_str) is str else json_str
         
         user = data['user_id']
         return ConversationsRequest(user)

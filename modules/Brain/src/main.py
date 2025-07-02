@@ -2,8 +2,7 @@ import sys
 from LLM.LLM import LLM
 from LLM.memory.Postgres import Postgres
 
-from Json.utils import processInput
-from Json.Types import UserRequest, UserAnswer, HistoryRequest, History, ConversationsRequest, AvailableConversations
+from Command_Handler import handle_command
 
 class Brain():
     """
@@ -66,31 +65,16 @@ class Brain():
             if not self.__TEST:
                 # Classical behavior
 
-                # --- Temporary fix ---
-                import json #TODO : Better management of messages
-                command = json.loads(command)
-                uuid = command['UUID']
-                command = json.dumps(command['request'])
-                # --- Temporary fix ---
-
-                request = processInput(command) # JSON -> Object
-                if(type(request) is UserRequest):
-                    answer:UserAnswer = self.__LLM.getRunner().handleUserRequest(request) # Processing
-                elif(type(request) is HistoryRequest):
-                    answer:History = self.__LLM.getRunner().getHistory(request.threadId)
-                elif(type(request) is ConversationsRequest):
-                    answer:AvailableConversations = self.__LLM.query().handleConversationsRequest(request)
-                else:
-                    raise NotImplementedError("Unknown command !")
-
-                print("{\"UUID\":\""+uuid+"\", \"answer\":"+answer.toJSON()+"}") # Answer object -> JSON # --- Temporary fix ---
-                sys.stdout.flush()
+                if output := handle_command(self.__LLM, command):
+                    print(output)
+                    sys.stdout.flush()
             
             else:
                 # TEST MODE
                 # Inputs are no longer JSON, but simple strings, easier to test manually in console
                 # Have fun !
                 thread_id = "test"
+                from Json.Types import UserRequest
 
                 request = UserRequest(command, thread_id)
                 answer = self.__LLM.getRunner().handleUserRequest(request) # Processing
