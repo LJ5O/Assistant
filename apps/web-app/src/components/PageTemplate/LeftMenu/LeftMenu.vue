@@ -24,7 +24,7 @@
                 <MenuElement icon="solar:dialog-2-line-duotone" text="Talk" :currentTab="route.name === 'talk'"/>
             </RouterLink>
                 <RouterLink v-for="(e,i) in conversations" :to="'/talk/'+e">
-                    <SubMenuElement icon="solar:dialog-2-line-duotone" :text="e"/>
+                    <SubMenuElement icon="solar:dialog-2-line-duotone" :id="'submenu-conv-'+i" :text="e"/>
                 </RouterLink>
             <MenuElement icon="solar:letter-line-duotone" text="Emails" />
             <MenuElement icon="solar:documents-line-duotone" text="Notes"/>

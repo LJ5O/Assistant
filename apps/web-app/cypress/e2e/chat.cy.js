@@ -229,5 +229,53 @@ describe('Chat with Agent', () => {
       cy.get('.dialog-cancel').click()
       cy.get('.dialog').should('not.exist')
     })
+
+    it('Can start a new conversation', () => {
+      prepare(cy);
+
+      cy.intercept('POST', '/ask', {
+        statusCode: 200,
+        body: answer
+      }).as('mockAsk');
+
+      cy.intercept('GET', '/history?conversation=*', {
+        statusCode: 200,
+        body: history2
+      });
+
+      cy.visit('/talk')
+      cy.get('#message-input').type('What\'s 6*7 ?')
+      cy.get('#start-new-conversation').click()
+      cy.location('pathname').should('not.eq', '/talk')
+
+      cy.get('.human-message').should('exist')
+      cy.get('.agent-message').should('exist')
+    })
+
+    it('Can switch from one conversation to another', () => {
+      prepare(cy);
+
+      cy.intercept('GET', '/history?conversation=123', { // So this doesn't mess with our test
+        statusCode: 200,
+        body: history
+      });
+
+      cy.intercept('GET', '/history?conversation=456', { // So this doesn't mess with our test
+        statusCode: 200,
+        body: history2
+      });
+
+      cy.visit('/talk')
+      
+      cy.get('#submenu-conv-1').click()
+      cy.location('pathname').should('eq', '/talk/456')
+      cy.get('.human-message > .text-xs > p').contains('Hi, how are you ?')
+      cy.get('.agent-message').should('exist')
+
+      cy.get('#submenu-conv-0').click()
+      cy.location('pathname').should('eq', '/talk/123')
+      cy.get('.human-message > .text-xs > p').contains('Test OK')
+      cy.get('.agent-message').should('not.exist')
+    })
  
 })

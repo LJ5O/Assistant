@@ -20,8 +20,9 @@
     const sendUserMessageToBack = async ()=>{
         inputDisabled.value = true;
         try{
-            const answer:UserAnswer = await sendMessage(userMessage.value,  Date.now()+'') //TODO : Find a better UUID solution
-            router.push("/talk/"+Date.now())
+            const convId = Date.now()+'';
+            const answer:UserAnswer = await sendMessage(userMessage.value, convId) //TODO : Find a better UUID solution
+            router.push("/talk/"+convId)
             userMessage.value = '';
         }catch(err){
             console.error(err)
@@ -52,7 +53,7 @@
                     :disabled="inputDisabled"
                     id="message-input"
                 />
-                <Icon @click="sendUserMessageToBack" icon="solar:plain-2-line-duotone" class="h-full text-4xl mr-2 hover:text-neutral-500 text-center"/>
+                <Icon @click="sendUserMessageToBack" id="start-new-conversation" icon="solar:plain-2-line-duotone" class="h-full text-4xl mr-2 hover:text-neutral-500 text-center"/>
             </div>
 
         </div>
