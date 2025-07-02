@@ -12,11 +12,17 @@ export function ask(req:AuthenticatedRequest, res:Response, brain:BrainManager):
 
         const request: UserRequest = {
             type: "UserRequest",
-            thread_id: userId+'.'+conversation,
+            thread_id: conversation.includes('.') ? conversation : userId+'.'+conversation,
             fields: {
                 input: message,
                 linked: []
             }
+        }
+
+        if(request.thread_id.split('.')[0]!==userId){
+            // Error, the user tried to access someone else conversations
+            res.status(422).json({ error: 'Missing or invalid fields in body.' })
+            return;
         }
 
         brain.ask(request)
