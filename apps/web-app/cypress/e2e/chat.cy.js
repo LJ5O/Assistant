@@ -1,6 +1,6 @@
 const answer = {
   "type": "UserAnswer",
-  "thread_id": "admin",
+  "thread_id": "admin.123",
   "fields": {
     "output": "The result of multiplying 2 by 2 is 4.",
     "linked": [],
@@ -57,7 +57,7 @@ const answer = {
 
 const history = {
   "type": "History",
-  "thread_id": "admin",
+  "thread_id": "admin.123",
   "messages": [
     {
       "type": "HumanMessage",
@@ -69,7 +69,7 @@ const history = {
 
 const history2 = {
   "type": "History",
-  "thread_id": "admin",
+  "thread_id": "admin.456",
   "messages": [
     {
         "type": "HumanMessage",
@@ -123,13 +123,28 @@ const history2 = {
   ]
 }
 
+const conversations = {
+  "type": "AvailableConversations",
+  "user_id": "admin",
+  "threads": ["admin.123", "admin.456"]
+}
+
+function prepare(cy){
+  // To run before each test
+  cy.intercept('GET', '/conversations', { // So this doesn't mess with our test
+    statusCode: 200,
+    body: conversations
+  });
+
+  cy.window().then((win) => {
+    win.sessionStorage.setItem("jwt", "aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc");
+  });
+}
+
 describe('Chat with Agent', () => {
 
     it('Can open the chat page with a JWT saved', () => {
-      cy.window().then((win) => {
-        // Set the user object in the sessionStorage
-        win.sessionStorage.setItem("jwt", "aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc"); // Valid exp expiring in 2100
-      });
+      prepare(cy);
       cy.visit('/talk')
       cy.location('pathname').should('eq', '/talk')
     })
@@ -140,28 +155,23 @@ describe('Chat with Agent', () => {
     })
 
     it('Can get an History of all messages sent when opening', () => {
-      cy.window().then((win) => {
-        // Set the user object in the sessionStorage
-        win.sessionStorage.setItem("jwt", "aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc"); // Valid exp expiring in 2100
-      });
+      prepare(cy);
 
-      cy.intercept('GET', '/history', {
+      cy.intercept('GET', '/history?conversation=123', {
         statusCode: 200,
         body: history
       }).as('mockAsk');
 
-      cy.visit('/talk') // History is auto loaded when oppening
+      cy.visit('/talk/123') // History is auto loaded when oppening
       cy.get('.human-message > .text-xs > p').contains('Test OK') // So we just have to wait for this
 
 
     })
   
     it('Messages element are displaying properly', () => {
-      cy.window().then((win) => {
-        win.sessionStorage.setItem("jwt", "aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc");
-      });
+      prepare(cy);
 
-      cy.intercept('GET', '/history', { // So this doesn't mess with our test
+      cy.intercept('GET', '/history?conversation=123', { // So this doesn't mess with our test
         statusCode: 200,
         body: history
       }).as('mockHist');
@@ -171,7 +181,7 @@ describe('Chat with Agent', () => {
         body: answer
       }).as('mockAsk');
 
-      cy.visit('/talk')
+      cy.visit('/talk/123')
       cy.get('#message-input').type('What\'s 2*2 ?')
       cy.get('#message-send').click()
 
@@ -183,29 +193,25 @@ describe('Chat with Agent', () => {
     })
 
     it('useless tool calls are not shown', () => {
-      cy.window().then((win) => {
-        win.sessionStorage.setItem("jwt", "aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc");
-      });
+      prepare(cy);
 
-      cy.intercept('GET', '/history', { // So this doesn't mess with our test
+      cy.intercept('GET', '/history?conversation=456', { // So this doesn't mess with our test
         statusCode: 200,
         body: history2
       }).as('mockHist');
-      cy.visit('/talk')
+      cy.visit('/talk/456')
 
       cy.get('.overflow-y-scroll').should('not.include.text', 'Nothing') // Useless calls must not be displayed
     })
 
     it('Shows error on Axios errors', () => {
-      cy.window().then((win) => {
-        win.sessionStorage.setItem("jwt", "aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc");
-      });
+      prepare(cy);
 
       // History request error
-      cy.intercept('GET', '/history', (req)=>{
+      cy.intercept('GET', '/history?conversation=123', (req)=>{
         req.destroy()//network error, https://docs.cypress.io/api/commands/intercept
       });
-      cy.visit('/talk')
+      cy.visit('/talk/123')
 
       cy.get('.dialog').should('be.visible')
       cy.get('.dialog-cancel').click()

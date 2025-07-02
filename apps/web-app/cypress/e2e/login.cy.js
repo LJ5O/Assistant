@@ -1,3 +1,9 @@
+const conversations = {
+  "type": "AvailableConversations",
+  "user_id": "admin",
+  "threads": ["admin.123", "admin.456"]
+}
+
 describe('Login form', () => {
   it('Is able to login with valid credentials', () => {
 
@@ -5,6 +11,11 @@ describe('Login form', () => {
       statusCode: 200,
       body: { token: 'aaa.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6NDA5OTY4MDAwMH0.ccc' }
     }).as('mockLogin');
+
+    cy.intercept('GET', '/conversations', { // So this doesn't mess with our test
+      statusCode: 200,
+      body: conversations
+    });
 
     cy.visit('/')
     cy.get('#input-login').type('admin')
