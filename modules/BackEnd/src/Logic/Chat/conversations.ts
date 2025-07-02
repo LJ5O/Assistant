@@ -15,11 +15,9 @@ export function conversations(req:AuthenticatedRequest, res:Response, brain:Brai
 
         brain.ask(request)
         .then(answer => {
-            console.log(answer)
             res.status(200).json(answer as AvailableConversations)
         })
-        .catch(e=>{
-            console.error(e)
+        .catch(_=>{
             res.status(504).json({ error: 'Timeout.' })
         })
 

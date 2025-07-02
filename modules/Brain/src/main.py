@@ -54,7 +54,7 @@ class Brain():
         The subprocess will start to listen to commands and will respond with the result.
         """
 
-        print("ready") # So parent process knows we're ready to work
+        print("{\"UUID\":\"\", \"answer\":\"ready\"}") # So parent process knows we're ready to work
         sys.stdout.flush() # Flush to "sent" it to parent process
 
         while True:
