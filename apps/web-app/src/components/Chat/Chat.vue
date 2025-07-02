@@ -2,6 +2,8 @@
     
     import {ref} from 'vue';
     import { Icon } from "@iconify/vue";
+    import { useRoute } from 'vue-router'
+    const route = useRoute()
 
     import Input from '../Form/Input.vue'
     import Message from './ChatComponent/Message.vue'
@@ -20,7 +22,7 @@
     const sendUserMessageToBack = async ()=>{
         inputDisabled.value = true;
         try{
-            const answer:UserAnswer = await sendMessage(userMessage.value) //TODO try catch
+            const answer:UserAnswer = await sendMessage(userMessage.value, route.params.id as string) //TODO try catch
             messagesList.value = []
             answer.fields.steps.forEach(message => {
                 messagesList.value.push(message)
@@ -37,7 +39,7 @@
     }
 
     const getPastMessages = ()=>{
-        getHistory()
+        getHistory(route.params.id as string)
         .then((hist:History) => {
             messagesList.value = []
             hist.messages.forEach(message => {

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { getStoredToken } from './Utils'
 import type { UserAnswer, History } from './Types/Types'
 
-export async function sendMessage(message:string):Promise<UserAnswer>{
+export async function sendMessage(message:string, conversation:string):Promise<UserAnswer>{
     /**
      * Function that tries to send a message written by User to the back-end and Python brain subprocess
      * Needs token to be stored / user to be logged-in
@@ -18,7 +18,8 @@ export async function sendMessage(message:string):Promise<UserAnswer>{
     try{
         const answer = await axios.post('http://127.0.0.1:3000/ask',
             { // Body JSON content
-                message
+                message,
+                conversation
             },
             {// Config
                 timeout: 10000,//10s
@@ -33,7 +34,7 @@ export async function sendMessage(message:string):Promise<UserAnswer>{
     }
 }
 
-export async function getHistory() {
+export async function getHistory(thread:string) {
     /**
      * Get the list of all sent messages
      */
@@ -47,7 +48,10 @@ export async function getHistory() {
         const answer = await axios.get('http://127.0.0.1:3000/history',
             {// Config
                 timeout: 10000,//10s
-                headers: {authorization: token}// Auth header is mandatory
+                headers: {authorization: token},// Auth header is mandatory
+                params: {
+                    conversation: thread
+                }
             })
             
         const data:History = answer.data

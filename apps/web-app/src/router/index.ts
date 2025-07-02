@@ -13,6 +13,11 @@ const router = createRouter({
       component: Login,
     },{
       path: '/talk',
+      name: 'create_talk',
+      component: Talk,
+      meta: { requiresAuth: true }
+    },{
+      path: '/talk/:id',
       name: 'talk',
       component: Talk,
       meta: { requiresAuth: true }
